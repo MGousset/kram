@@ -1,0 +1,149 @@
+django-admin startproject nom
+python manage.py startapp nom
+
+
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install python3 nginx supervisor 
+
+cd /home/marvin/projects
+mkdir $project_name
+cd $project_name
+python3 -m venv env
+source env/bin/activate
+git clone $repo_url
+python3 -m pip install --upgrade pip
+python3 -m pip install -r ${project_name}_git/requirements.txt
+
+-- Config NGINX
+
+cd /etc/nginx
+sudo touch sites-available/${project_name}
+sudo ln -s /etc/nginx/sites-available/${project_name} /etc/nginx/sites-enabled
+sudo vi sites-available/${project_name}
+sudo chown :www-data /home/kram/projects/KRAM/kram/kram/static/main/
+sudo service nginx reload
+
+-- Config https (après nom de domain valide)
+
+sudo snap install core; sudo snap refresh core
+sudo apt remove certbot
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx -d <domain> -d <domain>
+sudo systemctl status snap.certbot.renew.service
+sudo certbot renew --dry-run
+
+
+-- Config supervisor (lancement auto)
+
+sudo vi /etc/supervisor/conf.d/${project_name}.conf
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status
+
+-- Intall mysql
+(from offcial mysql website)
+sudo apt install phpmyadmin
+sudo mysql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Rvinma99.,';
+exit
+sudo mysql_secure_installation
+set new password and yes to all
+mysql -u example_user -p
+CREATE DATABASE example_database;
+CREATE USER 'example_user'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+GRANT ALL ON example_database.* TO 'example_user'@'%';
+mysql -D db -u user -h localhost -P 3306 -pmdp
+
+-- Connect Django to mysql
+python -m pip install mysqlclient ou mysql-connector-python
+
+# settings.py
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "OPTIONS": {
+            "read_default_file": "/path/to/my.cnf",
+        },
+    }
+}
+
+# my.cnf
+[client]
+database = NAME
+user = USER
+password = PASSWORD
+default-character-set = utf8
+
+migrate
+restart
+
+-- Nginx for php:
+sudo mkdir /var/www/your_domain
+sudo chown -R $USER:$USER /var/www/your_domain
+sudo vi /etc/nginx/sites-available/your_domain
+
+sudo systemctl reload nginx
+nano /var/www/your_domain/index.html
+
+<html>
+  <head>
+    <title>your_domain website</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+
+    <p>This is the landing page of <strong>your_domain</strong>.</p>
+  </body>
+</html>
+
+test
+
+
+-- Test php
+
+nano /var/www/your_domain/info.php
+
+<?php
+phpinfo();
+
+test php
+
+-- Connect Phpmyadmin
+sudo ln -s /usr/share/phpmyadmin /var/www/kram/liencaché
+
+sudo apt install pwgen
+pwgen -s 32 1
+sudo vi /etc/phpmyadmin/conf.d/pma_secure.php
+
+<?php
+
+# PhpMyAdmin Settings
+# This should be set to a random string of at least 32 chars
+$cfg['blowfish_secret'] = 'CHANGE_THIS_TO_A_STRING_OF_32_RANDOM_CHARACTERS';
+
+$i=0;
+$i++;
+
+$cfg['Servers'][$i]['auth_type'] = 'cookie';
+$cfg['Servers'][$i]['AllowNoPassword'] = false;
+$cfg['Servers'][$i]['AllowRoot'] = false;
+
+?>
+
+openssl passwd
+sudo vi /etc/nginx/pma_pass
+sudo nano /etc/nginx/sites-available/your_domain
+
+location ^~ /hiddenlink/ {
+
+auth_basic "Admin Login";
+auth_basic_user_file /etc/nginx/pma_pass;
+
+location ~ \.php$ {
+include snippets/fastcgi-php.conf;
+fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        }
+}
