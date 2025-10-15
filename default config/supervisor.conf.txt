@@ -1,9 +1,0 @@
-[program:<project_name>]
-command = /home/marvin/projects/<project_name>/env/bin/gunicorn <project_name>.wsgi:application
-user = marvin
-directory = <path_manage.py>
-autostart = true
-autorestart = true
-environment = DJANGO_SETTINGS_MODULE='<project_nam>.settings.production'
-stderr_logfile=/var/log/supervisor/test.err.log
-stdout_logfile=/var/log/supervisor/test.out.log
