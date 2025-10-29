@@ -1,0 +1,38 @@
+import * as THREE from 'three'
+
+export function initScene(
+  backgroundColor: THREE.ColorRepresentation,
+  ratio: number,
+): {
+  scene: THREE.Scene
+  camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
+} {
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(backgroundColor)
+
+  const camera = new THREE.PerspectiveCamera(15, ratio, 0.1, 1000)
+  camera.far = 500
+  camera.position.z = 5
+
+  scene.add(camera)
+
+  return { scene, camera }
+}
+
+export const getDefaultUniforms = () => {
+  return {
+    u_time: { value: 0.0 },
+    u_mouse: {
+      value: {
+        x: 0.0,
+        y: 0.0,
+      },
+    },
+    u_resolution: {
+      value: {
+        x: window.innerWidth * window.devicePixelRatio,
+        y: window.innerHeight * window.devicePixelRatio,
+      },
+    },
+  }
+}

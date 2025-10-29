@@ -19,6 +19,24 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+
+  --gradient-x-1: 36%;
+  --gradient-y-1: 91%;
+
+  --gradient-x-2: 19%;
+  --gradient-y-2: 67%;
+
+  --gradient-x-3: 17%;
+  --gradient-y-3: 71%;
+
+  --gradient-x-4: 24%;
+  --gradient-y-4: 93%;
+
+  --gradient-x-5: 26%;
+  --gradient-y-5: 82%;
+
+  --gradient-x-6: 10%;
+  --gradient-y-6: 34%;
 }
 
 /* semantic color variables for this project */
@@ -61,7 +79,6 @@
 body {
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
   transition:
     color 0.5s,
     background-color 0.5s;

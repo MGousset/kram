@@ -7,6 +7,7 @@
     "node": "22.20"
   },
   "scripts": {
+    "preinstall": "typesync || :",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "watch": "run-p type-check \"watch-only {@}\" --",
@@ -19,14 +20,20 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vueuse/core": "^14.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.40.7",
+    "sass": "^1.93.2",
+    "three": "^0.180.0",
+    "typesync": "^0.14.3",
     "vue": "^3.5.22"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
+    "@types/bootstrap": "~5.2.10",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.18.6",
+    "@types/three": "~0.180.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitest/eslint-plugin": "^1.3.13",
     "@vue/eslint-config-prettier": "^10.2.0",
