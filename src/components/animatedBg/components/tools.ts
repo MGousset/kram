@@ -3,6 +3,7 @@ import * as THREE from 'three'
 export function initScene(
   backgroundColor: THREE.ColorRepresentation,
   ratio: number,
+  cam_fog: number,
 ): {
   scene: THREE.Scene
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
@@ -10,7 +11,7 @@ export function initScene(
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(backgroundColor)
 
-  const camera = new THREE.PerspectiveCamera(15, ratio, 0.1, 1000)
+  const camera = new THREE.PerspectiveCamera(cam_fog, ratio, 0.1, 1000)
   camera.far = 500
   camera.position.z = 5
 

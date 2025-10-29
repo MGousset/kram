@@ -1,17 +1,29 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { getDefaultUniforms, initScene } from './tools'
 import { fragment, vertex } from './shaders'
 
 import { useWindowSize } from '@vueuse/core'
 import * as THREE from 'three'
+import { generateRandomColor, hexToRgb } from '@/tools/tools'
+
+const COLOR_MAIN = ref('a28af1')
+const COLOR_1 = ref('a28af1')
+const COLOR_2 = ref('531ff1')
+
+const AMP_MULTIPLIER = 1.4
+const MESH_SIZE = 4
+const BASE_ROTATION = -Math.PI / 2.5
+const Y_TRANSLATION = 0
+const FACTOR_RATIO = 50
+const CAM_FOG = 11
+const TIME_FRACTOR = 15
 
 /** Define props */
 type sceneProps = {
   backgroundColor?: THREE.ColorRepresentation
-  meshColor?: THREE.ColorRepresentation
 }
-const { backgroundColor = 'red', meshColor = 'white' } = defineProps<sceneProps>()
+const { backgroundColor = 'red' } = defineProps<sceneProps>()
 
 /** Define const */
 let renderer = new THREE.WebGLRenderer()
@@ -19,36 +31,45 @@ const renderCanvas = ref<HTMLCanvasElement | null>(null)
 
 const { width, height } = useWindowSize()
 const aspectRatio = computed(() => width.value / height.value)
-const { scene, camera } = initScene(backgroundColor, aspectRatio.value)
+const { scene, camera } = initScene(backgroundColor, aspectRatio.value, CAM_FOG)
 
+const randomisePosition = new THREE.Vector2(1, 2)
 const uniforms = {
   ...getDefaultUniforms(),
   u_pointsize: { value: 2.0 },
   // wave 1
   u_noise_freq_1: { value: 3.0 },
-  u_noise_amp_1: { value: 0.2 },
+  u_noise_amp_1: { value: 0.2 * AMP_MULTIPLIER },
   u_spd_modifier_1: { value: 1.0 },
   // wave 2
   u_noise_freq_2: { value: 2.0 },
-  u_noise_amp_2: { value: 0.3 },
+  u_noise_amp_2: { value: 0.3 * AMP_MULTIPLIER },
   u_spd_modifier_2: { value: 0.8 },
+
+  u_bgMain: { value: hexToRgb(COLOR_MAIN.value) },
+  u_color1: { value: hexToRgb(COLOR_1.value) },
+  u_color2: { value: hexToRgb(COLOR_2.value) },
+  u_randomisePosition: { value: randomisePosition },
 }
 
-const lenght = 4
-const mesh = new THREE.Mesh(
-  new THREE.PlaneGeometry(lenght, lenght, 128, 128),
-  new THREE.ShaderMaterial({
-    vertexShader: vertex,
-    fragmentShader: fragment,
-    uniforms: uniforms,
-    wireframe: true,
-  }),
-)
+/** Create Mesh */
+const vertexShader = vertex
+const fragmentShader = fragment
+
+const plan = new THREE.PlaneGeometry(MESH_SIZE, MESH_SIZE, 128, 128)
+const materiel = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader,
+  uniforms: uniforms,
+  wireframe: true,
+})
+
+const mesh = new THREE.Mesh(plan, materiel)
 
 mesh.rotation.z = Math.PI / 4
-mesh.rotation.x = -Math.PI / 4
+mesh.rotation.x = BASE_ROTATION
 
-mesh.translateOnAxis(new THREE.Vector3(1, 1, 0), lenght / 20)
+mesh.translateOnAxis(new THREE.Vector3(1, 1, 0), Y_TRANSLATION)
 
 scene.add(mesh)
 
@@ -58,7 +79,7 @@ const animate = (): void => {
   requestAnimationFrame(animate)
 
   const elapsed = clock.getElapsedTime()
-  uniforms.u_time.value = elapsed / 4
+  uniforms.u_time.value = elapsed / TIME_FRACTOR
 
   renderer.render(scene, camera)
 }
@@ -73,26 +94,17 @@ onMounted(() => {
   animate()
 })
 
-function clockSwitch(): void {
-  if (clock.running) {
-    clock.stop()
-  } else {
-    clock.start()
-  }
+function randomColor(): void {
+  uniforms.u_bgMain.value = generateRandomColor()
+  uniforms.u_color1.value = generateRandomColor()
+  uniforms.u_color2.value = generateRandomColor()
 }
 
-function rotatePlan(mousePos: { x: number; y: number }): void {
-  const midScreenX = width.value / 2
-  const midScreenY = height.value / 2
-
-  const xRatio = (mousePos.x - midScreenX) / midScreenX
-  const yRatio = (mousePos.y - midScreenY) / midScreenY
-
-  mesh.rotation.y = (xRatio * Math.PI) / 16
-  mesh.rotation.x = -Math.PI / 4 + (yRatio * Math.PI) / 16
+function wireframeSwitch(): void {
+  materiel.wireframe = !materiel.wireframe
 }
 </script>
 
 <template>
-  <canvas ref="renderCanvas" @click="clockSwitch" @mousemove="rotatePlan"> </canvas>
+  <canvas ref="renderCanvas" @click.left="randomColor" @click.right="wireframeSwitch"> </canvas>
 </template>
