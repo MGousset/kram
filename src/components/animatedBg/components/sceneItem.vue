@@ -33,7 +33,6 @@ const { width, height } = useWindowSize()
 const aspectRatio = computed(() => width.value / height.value)
 const { scene, camera } = initScene(backgroundColor, aspectRatio.value, CAM_FOG)
 
-const randomisePosition = new THREE.Vector2(1, 2)
 const uniforms = {
   ...getDefaultUniforms(),
   u_pointsize: { value: 2.0 },
@@ -49,7 +48,6 @@ const uniforms = {
   u_bgMain: { value: hexToRgb(COLOR_MAIN.value) },
   u_color1: { value: hexToRgb(COLOR_1.value) },
   u_color2: { value: hexToRgb(COLOR_2.value) },
-  u_randomisePosition: { value: randomisePosition },
 }
 
 /** Create Mesh */
@@ -91,7 +89,7 @@ onMounted(() => {
     antialias: true,
   })
   renderer.setSize(width.value, height.value)
-  animate()
+  renderer.render(scene, camera)
 })
 
 function randomColor(): void {
@@ -106,5 +104,6 @@ function wireframeSwitch(): void {
 </script>
 
 <template>
-  <canvas ref="renderCanvas" @click.left="randomColor" @click.right="wireframeSwitch"> </canvas>
+  <canvas ref="renderCanvas" @click.left="randomColor" @click.right.prevent="wireframeSwitch">
+  </canvas>
 </template>

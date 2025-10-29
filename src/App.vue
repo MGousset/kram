@@ -24,29 +24,47 @@ async function resetMousePosition(): Promise<void> {
   <animatedBg></animatedBg>
   <header class="w-100">
     <div class="wrapper">
-      <h1>On est là</h1>
+      <h1>KRAM AGENCY</h1>
     </div>
   </header>
 
   <main class="w-100 h-100" @mousemove="updateMousePosition" @mouseout="resetMousePosition">
-    <div id="container"></div>
+    <div id="container" class="h-100">
+      <div id="content" class="h-100"></div>
+    </div>
   </main>
 </template>
 
-<style>
+<style lang="scss">
+@import './assets/main.scss';
+
 header {
   position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100px;
+
+  background-color: rgba(0, 0, 0, 0.5);
+
+  h1 {
+    color: $color;
+  }
 }
 
 main {
   padding: 2rem;
 
   #container {
-    position: relative;
-    top: 60px;
-    height: 500px;
+    padding-top: 100px;
     width: 100%;
-    /* border: 1px white solid; */
+
+    #content {
+      position: relative;
+      height: 100%;
+      border: 5px $border-color solid;
+    }
   }
 
   @media (min-width: 1250px) {
