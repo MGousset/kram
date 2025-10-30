@@ -3,7 +3,7 @@
 type sceneProps = {
   href: string
   label?: string
-  class?: string
+  classes?: string
   animation?: string
 }
 
@@ -17,7 +17,7 @@ const durationString = duration + 's'
 </script>
 
 <template>
-  <a :class="props.class" :href="props.href">{{ label }}</a>
+  <a :class="props.classes" :href="props.href">{{ label }}</a>
 </template>
 
 <style lang="scss">

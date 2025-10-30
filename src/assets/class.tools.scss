@@ -8,6 +8,10 @@
   flex-direction: row;
 }
 
+.flex-start {
+  justify-content: flex-start;
+}
+
 .flex-center {
   justify-content: center;
 }
@@ -34,11 +38,13 @@
 
 .underlign:after {
   content: '';
+  position: relative;
+  top: -0.75rem;
   width: 0px;
-  height: 3px;
+  height: 0.125rem;
   display: block;
   background: $color;
-  transition: 300ms;
+  transition: 200ms;
 }
 
 .underlign:hover:after {
