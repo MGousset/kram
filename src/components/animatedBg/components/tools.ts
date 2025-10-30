@@ -31,8 +31,8 @@ export const getDefaultUniforms = () => {
     },
     u_resolution: {
       value: {
-        x: window.innerWidth * window.devicePixelRatio,
-        y: window.innerHeight * window.devicePixelRatio,
+        x: screen.width * window.devicePixelRatio,
+        y: screen.height * window.devicePixelRatio,
       },
     },
   }

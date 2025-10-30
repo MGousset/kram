@@ -21,9 +21,9 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } | nul
 export function generateRandomColor(
   mix: THREE.Color = new THREE.Color(255, 255, 255),
 ): THREE.Color {
-  let red = Math.random() * 255
-  let green = Math.random() * 255
-  let blue = Math.random() * 255
+  let red = Math.random() * 180
+  let green = Math.random() * 180
+  let blue = Math.random() * 180
 
   // mix the color
   if (mix != null) {

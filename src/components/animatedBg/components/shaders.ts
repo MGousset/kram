@@ -62,8 +62,14 @@ export const fragment = `
   uniform vec3 u_bgMain;
   uniform vec3 u_color1;
   uniform vec3 u_color2;
+  uniform vec3 u_color3;
+  uniform vec3 u_color4;
+
   uniform float u_time;
-  uniform float u_randomisePosition;
+  uniform float u_cspd_modifier_1;
+  uniform float u_cspd_modifier_2;
+  uniform float u_cspd_modifier_3;
+  uniform float u_cspd_modifier_4;
 
   varying vec2 vUv;
 
@@ -103,17 +109,22 @@ export const fragment = `
   void main() {
     vec3 c1 = rgb(u_color1.r, u_color1.g, u_color1.b);
     vec3 c2 = rgb(u_color2.r, u_color2.g, u_color2.b);
+    vec3 c3 = rgb(u_color3.r, u_color3.g, u_color3.b);
+    vec3 c4 = rgb(u_color4.r, u_color4.g, u_color4.b);
     vec3 bgMain = rgb(u_bgMain.r, u_bgMain.g, u_bgMain.b);
 
-    float noise1 = snoise(vUv + u_time * 0.08);
-    float noise2 = snoise(vUv * 2. + u_time * 0.1);
+    float noise1 = snoise(vUv + u_time * u_cspd_modifier_1);
+    float noise2 = snoise(vUv * 2. + u_time * u_cspd_modifier_2);
+    float noise3 = snoise(vUv * 2. + u_time * u_cspd_modifier_3);
+    float noise4 = snoise(vUv * 2. + u_time * u_cspd_modifier_4);
 
-    vec3 color = mix(bgMain, c1, noise1 * 0.6);
+    vec3 color = mix(bgMain, c1, noise1 * .6);
     color = mix(color, c2, noise2 * .4);
+    color = mix(color, c3, noise3 * .2);
+    color = mix(color, c4, noise4 * .8);
 
     float border = smoothstep(0.1, 0.6, vUv.x);
-
-    color = mix(color, color, 1. -border);
+    color = mix(color, bgMain, 1. -border);
 
     gl_FragColor = vec4(color, 1.0);
   }

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import animatedBg from './components/animatedBg/animatedBg.vue'
 import { ref } from 'vue'
+import AnimatedLink from './components/animatedLink.vue'
+import AnimatedText from './components/animatedText.vue'
 
 const mousePos = ref({ x: -1, y: -1 })
 
@@ -22,9 +24,37 @@ async function resetMousePosition(): Promise<void> {
 
 <template>
   <animatedBg></animatedBg>
-  <header class="w-100">
+  <header class="w-100 h-100 flex flex-center flex-align-center">
     <div class="wrapper">
-      <h1>KRAM AGENCY</h1>
+      <AnimatedText label="KRAM AGENCY" class="title"></AnimatedText>
+      <nav class="navbar w-100">
+        <ul class="navbar-nav w-100 flex flex-row flex-between">
+          <li class="nav-item">
+            <AnimatedLink
+              class="nav-link underlign"
+              href="#Artiste"
+              label="Artiste"
+              animation="slide-in"
+            ></AnimatedLink>
+          </li>
+          <li class="nav-item">
+            <AnimatedLink
+              class="nav-link underlign"
+              href="#Events"
+              label="Events"
+              animation="slide-in"
+            ></AnimatedLink>
+          </li>
+          <li class="nav-item">
+            <AnimatedLink
+              class="nav-link underlign"
+              href="#Contact"
+              label="Contact"
+              animation="slide-in"
+            ></AnimatedLink>
+          </li>
+        </ul>
+      </nav>
     </div>
   </header>
 
@@ -40,16 +70,28 @@ async function resetMousePosition(): Promise<void> {
 
 header {
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  pointer-events: none;
 
-  height: 100px;
+  .title {
+    white-space: pre;
+    pointer-events: visible;
+    line-height: 10vw;
+    font-size: 12vw;
+    margin: 0;
+    padding: 0;
+  }
 
-  background-color: rgba(0, 0, 0, 0.5);
+  .navbar {
+    transition: all ease-in-out 1s 1s;
 
-  h1 {
-    color: $color;
+    margin-left: 1.2vw;
+    background: none;
+
+    a {
+      font-size: 3vw;
+      color: $color;
+      pointer-events: visible;
+    }
   }
 }
 
@@ -61,9 +103,6 @@ main {
     width: 100%;
 
     #content {
-      position: relative;
-      height: 100%;
-      border: 5px $border-color solid;
     }
   }
 
