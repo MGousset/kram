@@ -6,7 +6,7 @@ export function initScene(
   cam_fog: number,
 ): {
   scene: THREE.Scene
-  camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
+  camera: THREE.PerspectiveCamera
 } {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(backgroundColor)

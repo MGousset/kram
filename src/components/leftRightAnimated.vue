@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** Define props */
 type sceneProps = {
-  href: string
+  href?: string
   label?: string
   classes?: string
   animation?: string
@@ -17,7 +17,8 @@ const durationString = duration + 's'
 </script>
 
 <template>
-  <a :class="props.classes" :href="props.href">{{ label }}</a>
+  <a v-if="href" :class="props.classes" :href="props.href">{{ label }}</a>
+  <p v-else :class="props.classes">{{ label }}</p>
 </template>
 
 <style lang="scss">

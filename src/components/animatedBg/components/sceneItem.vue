@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { getDefaultUniforms, initScene } from './tools'
 import { fragment, vertex } from './shaders'
 
 import * as THREE from 'three'
 import { generateRandomColor, hexToRgb } from '@/tools/tools'
+import { useWindowSize } from '@vueuse/core'
 
 const COLOR_MAIN = ref('a28af1')
 
@@ -26,9 +27,20 @@ const { backgroundColor = 'red' } = defineProps<sceneProps>()
 let renderer = new THREE.WebGLRenderer()
 const renderCanvas = ref<HTMLCanvasElement | null>(null)
 
-const width = screen.width
-const height = screen.height
-const { scene, camera } = initScene(backgroundColor, width / height, CAM_FOG)
+const { width, height } = useWindowSize()
+const aspectRation = computed(() => width.value / height.value)
+const { scene, camera } = initScene(backgroundColor, aspectRation.value, CAM_FOG)
+
+function updateRatio(): void {
+  camera.aspect = aspectRation.value
+  camera.updateProjectionMatrix()
+
+  renderer.setSize(width.value, height.value)
+  renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.render(scene, camera)
+}
+
+watch(aspectRation, updateRatio)
 
 const uniforms = {
   ...getDefaultUniforms(),
@@ -94,9 +106,8 @@ onMounted(() => {
     canvas: renderCanvas.value ?? undefined,
     antialias: true,
   })
-  renderer.setSize(width, height)
 
-  renderer.render(scene, camera)
+  updateRatio()
   // animate()
 })
 
@@ -106,10 +117,14 @@ function randomColor(): void {
   uniforms.u_color2.value = generateRandomColor()
   uniforms.u_color3.value = generateRandomColor()
   uniforms.u_color4.value = generateRandomColor()
+
+  renderer.render(scene, camera) // TO remove when animate
 }
 
 function wireframeSwitch(): void {
   materiel.wireframe = !materiel.wireframe
+
+  renderer.render(scene, camera) // TO remove when animate
 }
 </script>
 

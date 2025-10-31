@@ -1,5 +1,11 @@
 import * as THREE from 'three'
 
+export const enum ANIMATION {
+  random = 'random',
+  randomstep = 'randomstep',
+  grow = 'grow',
+}
+
 export const randomLetters = 'QWERTYUIOPASDFGHJKLZXCVBNM?/:!-+#'.split('')
 
 export function randomInteger(min: number, max: number) {
