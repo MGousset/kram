@@ -6,6 +6,7 @@ import { fragment, vertex } from './shaders'
 import * as THREE from 'three'
 import { generateRandomColor, hexToRgb } from '@/tools/tools'
 import { useWindowSize } from '@vueuse/core'
+import AnimatedBg from '../animatedBg.vue'
 
 const COLOR_MAIN = ref('a28af1')
 
@@ -19,28 +20,36 @@ const TIME_FRACTOR = 15
 
 /** Define props */
 type sceneProps = {
+  animated: boolean
   backgroundColor?: THREE.ColorRepresentation
 }
-const { backgroundColor = 'red' } = defineProps<sceneProps>()
+const { animated = true, backgroundColor = 'red' } = defineProps<sceneProps>()
 
 /** Define const */
 let renderer = new THREE.WebGLRenderer()
 const renderCanvas = ref<HTMLCanvasElement | null>(null)
 
-const { width, height } = useWindowSize()
-const aspectRation = computed(() => width.value / height.value)
-const { scene, camera } = initScene(backgroundColor, aspectRation.value, CAM_FOG)
+const { scene, camera } = initScene(backgroundColor, CAM_FOG)
 
-function updateRatio(): void {
-  camera.aspect = aspectRation.value
+/** Render when component is in DOM */
+onMounted(() => {
+  renderer = new THREE.WebGLRenderer({
+    canvas: renderCanvas.value ?? undefined,
+    antialias: true,
+  })
+
+  camera.aspect = screen.width / screen.height
   camera.updateProjectionMatrix()
 
-  renderer.setSize(width.value, height.value)
+  renderer.setSize(screen.width, screen.height)
   renderer.setPixelRatio(window.devicePixelRatio)
-  renderer.render(scene, camera)
-}
 
-watch(aspectRation, updateRatio)
+  if (animated) {
+    animate()
+  } else {
+    renderer.render(scene, camera)
+  }
+})
 
 const uniforms = {
   ...getDefaultUniforms(),
@@ -93,23 +102,22 @@ scene.add(mesh)
 const clock = new THREE.Clock()
 const animate = async (): Promise<void> => {
   requestAnimationFrame(animate)
+  if (!animated) {
+    if (clock.running) {
+      clock.stop()
+    }
+    return
+  }
+  if (!clock.running) {
+    clock.startTime = clock.oldTime
+    clock.start()
+  }
 
   const elapsed = clock.getElapsedTime()
   uniforms.u_time.value = elapsed / TIME_FRACTOR
 
   renderer.render(scene, camera)
 }
-
-/** Render when component is in DOM */
-onMounted(() => {
-  renderer = new THREE.WebGLRenderer({
-    canvas: renderCanvas.value ?? undefined,
-    antialias: true,
-  })
-
-  updateRatio()
-  // animate()
-})
 
 function randomColor(): void {
   uniforms.u_bgMain.value = generateRandomColor()
@@ -118,17 +126,24 @@ function randomColor(): void {
   uniforms.u_color3.value = generateRandomColor()
   uniforms.u_color4.value = generateRandomColor()
 
-  renderer.render(scene, camera) // TO remove when animate
+  if (!animated) {
+    renderer.render(scene, camera)
+  }
 }
 
 function wireframeSwitch(): void {
   materiel.wireframe = !materiel.wireframe
 
-  renderer.render(scene, camera) // TO remove when animate
+  if (!animated) {
+    renderer.render(scene, camera)
+  }
 }
 </script>
 
 <template>
-  <canvas ref="renderCanvas" @click.left="randomColor" @click.right.prevent="wireframeSwitch">
-  </canvas>
+  <canvas
+    ref="renderCanvas"
+    @click.left="randomColor"
+    @click.right.prevent="wireframeSwitch"
+  ></canvas>
 </template>

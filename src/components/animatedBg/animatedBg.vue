@@ -3,23 +3,18 @@ import { ref } from 'vue'
 import sceneItem from './components/sceneItem.vue'
 
 const backgroundColor = ref('black')
+
+const { animated } = defineProps<{ animated: boolean }>()
 </script>
 
 <template>
-  <div class="h-100 w-100">
-    <sceneItem id="scene" :background-color="backgroundColor"></sceneItem>
-    <div id="layout no-events" class="h-100 w-100"></div>
+  <div id="backgroundContainer">
+    <sceneItem id="scene" :background-color="backgroundColor" :animated></sceneItem>
   </div>
 </template>
 
 <style lang="scss">
-#scene,
-#layout {
-  position: absolute;
-}
-
-#layout {
-  background-color: rgba(255, 255, 255, 0.2);
-  background-image: url('../../assets/noise.svg');
+#backgroundContainer {
+  overflow: hidden;
 }
 </style>

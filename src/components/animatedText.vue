@@ -1,16 +1,27 @@
 <script setup lang="ts">
-import { ANIMATION, randomLetters } from '@/tools/tools'
-import { onMounted, ref, watch } from 'vue'
+import { ANIMATION, growElementText, randomLetters } from '@/tools/tools'
+import { contain } from 'three/src/extras/TextureUtils.js'
+import { onMounted, ref } from 'vue'
+
+const MULTIPLIER = 1.2
+const GROW_DURATION = 0.1 // set size animation time, seems good like this
+const REDUCE_DURATION = 0.3 // reset size animation time, seems good like this
+
+const growDuration = GROW_DURATION + 's'
+const reduceDuration = REDUCE_DURATION + 's'
 
 /** Define props */
 type sceneProps = {
+  animated: boolean
   label: string
-  fontSize: string
+  fontSize: number
   containerClasses?: string
   textClasses?: string
+  textStyles?: string
   onMontedAnimation?: ANIMATION
   onHoverTextAnimation?: ANIMATION
   onHoverLetterAnimation?: ANIMATION
+  improtIndex?: Set<number>
 }
 
 const props = defineProps<sceneProps>()
@@ -18,45 +29,21 @@ const props = defineProps<sceneProps>()
 /** Define variables  */
 const initialTextArray = props.label.split('')
 const textArray = ref([...initialTextArray])
+let container: HTMLElement | null
+const spanWidth = ref('0px')
 
-/** Animation of one letter */
-async function animateLetter(p: {
-  animation?: ANIMATION
-  char?: string
-  step?: number
-  element?: HTMLElement
-}): Promise<string | void> {
-  const { animation, step, element } = p
-  if (!animation) {
-    return
-  }
+onMounted(() => {
+  container = document.getElementById('textContainer')
+  window.addEventListener('resize', onResize)
+  onResize()
 
-  let char = p.char
-  if ([ANIMATION.random, ANIMATION.randomstep].includes(animation) && char) {
-    char = randomLetters[Math.floor(Math.random() * randomLetters.length)]!
-    return char
-  }
-  if (element) {
-    if (animation === ANIMATION.grow) {
-      const currentSize = Number(props.fontSize.slice(0, -2))
-      const unity = element.style.fontSize[-2] ?? 'vw'
-      if (isNaN(currentSize)) {
-        return
-      }
-      element.style.fontSize = 1.2 * currentSize + unity
-      element.classList.add('hovered')
-      element.addEventListener(
-        'mouseleave',
-        () => {
-          element.style.fontSize = currentSize + unity
-          element.classList.remove('hovered')
-        },
-        {
-          once: true,
-        },
-      )
-    }
-  }
+  animate({ animation: ANIMATION.randomstep, duration: 2000, stepDuration: 15 })
+})
+
+function onResize(): void {
+  let containerWidth = container?.clientWidth ?? 0
+  containerWidth = containerWidth > 0 ? containerWidth : window.innerWidth
+  spanWidth.value = containerWidth / initialTextArray.length + 'px'
 }
 
 /** Animation of all text */
@@ -66,7 +53,7 @@ async function animate(options?: {
   animation?: ANIMATION
 }): Promise<void> {
   const { animation, duration = 200, stepDuration = 15 } = options ?? {}
-  if (!animation) {
+  if (!animation || !props.animated) {
     return
   }
 
@@ -101,9 +88,41 @@ async function animate(options?: {
   }
 }
 
-onMounted(() => {
-  animate({ animation: ANIMATION.randomstep, duration: 2000, stepDuration: 15 })
-})
+/** Animation of one letter */
+async function animateLetter(p: {
+  animation?: ANIMATION
+  char?: string
+  step?: number
+  element?: HTMLElement
+}): Promise<string | void> {
+  const { animation, step, element } = p
+  if (!animation || !props.animated) {
+    return
+  }
+
+  let char = p.char
+  if ([ANIMATION.random, ANIMATION.randomstep].includes(animation) && char) {
+    char = randomLetters[Math.floor(Math.random() * randomLetters.length)]!
+    return char
+  }
+  if (element) {
+    if (animation === ANIMATION.grow && !element.classList.contains('inTransition')) {
+      element.classList.add('inTransition')
+      const currentFont = growElementText(element, MULTIPLIER)
+
+      await new Promise((f) => setTimeout(f, GROW_DURATION * 1000))
+      element.classList.remove('inTransition')
+
+      if (!currentFont) {
+        return
+      }
+      element.classList.add('outTransition')
+      element.style.fontSize = currentFont
+      await new Promise((f) => setTimeout(f, REDUCE_DURATION * 1000))
+      element.classList.remove('outTransition')
+    }
+  }
+}
 
 function onMouseEnterLetter(e: MouseEvent, char: string): void {
   if (e.target && props.onHoverLetterAnimation) {
@@ -117,13 +136,19 @@ function onMouseEnterLetter(e: MouseEvent, char: string): void {
 </script>
 
 <template>
-  <div class="flex flex-row .flex-start" :class="props.containerClasses" @mouseenter="animate()">
+  <div
+    id="textContainer"
+    class="w-100 flex flex-row flex-"
+    :class="props.containerClasses"
+    @mouseenter="animate()"
+  >
     <span
       v-for="(char, i) in textArray"
       :key="i"
       class="letter flex flex-center flex-align-center"
       :class="props.textClasses"
       @mouseenter="(e: MouseEvent) => onMouseEnterLetter(e, char)"
+      :style="{ fontSize: (improtIndex?.has(i) ? fontSize * MULTIPLIER : fontSize) + 'vw' }"
     >
       {{ char }}
     </span>
@@ -132,12 +157,16 @@ function onMouseEnterLetter(e: MouseEvent, char: string): void {
 
 <style lang="scss">
 .letter {
-  transition: font-size 0.3s ease-in-out; // reset size animation time
-  width: 7.5vw; // Arbitrary looking good
-  font-size: v-bind(fontSize);
+  width: v-bind(spanWidth);
+  line-height: 10vw;
+  height: 10vw;
 
-  &.hovered {
-    transition: font-size 0.07s ease-in-out; // set size animation time
+  &.outTransition {
+    transition: font-size v-bind(reduceDuration) ease-in-out;
+  }
+
+  &.inTransition {
+    transition: font-size v-bind(growDuration) ease-in-out;
   }
 }
 </style>

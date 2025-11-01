@@ -42,3 +42,14 @@ export function generateRandomColor(
 
   return new THREE.Color(red, green, blue)
 }
+
+export function growElementText(element: HTMLElement, multiplier: number): string {
+  const currentFont = element.style.fontSize
+  const currentSize = Number(currentFont.slice(0, -2))
+  const unity = currentFont.slice(-2)
+  if (isNaN(currentSize) || !unity) {
+    return ''
+  }
+  element.style.fontSize = multiplier * currentSize + unity
+  return currentFont
+}
