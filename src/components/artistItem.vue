@@ -1,21 +1,25 @@
 <script setup lang="ts">
 /** Define props */
-type sceneProps = {
+export type artistesProps = {
   name: string
-  desc: string
+  description: string
   imgUrls: string[]
   backGroundVideoUrl?: string
 }
 
-const props = defineProps<sceneProps>()
+const props = defineProps<artistesProps>()
 </script>
 
 <template>
-  <div id="container"></div>
+  <div id="artiteContainer" class="h-100 w-100">
+    <h2>
+      {{ name }}
+    </h2>
+    <p>{{ description }}</p>
+  </div>
 </template>
 
 <style lang="scss">
-#container {
-  height: 500px;
+#artiteContainer {
 }
 </style>
