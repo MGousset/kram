@@ -151,7 +151,10 @@ const artistesBgImgUrls = ['/src/img/bg-1.jpg']
             <h1>ARTISTES</h1>
           </div>
           <div class="w-100 sectionContent flex flex-align-center flex-center">
-            <AutoPhotoCarousel :imgUrls="artistesBgImgUrls"></AutoPhotoCarousel>
+            <AutoPhotoCarousel
+              :imgUrls="artistesBgImgUrls"
+              containerClasses="artistesBgImgs"
+            ></AutoPhotoCarousel>
             <div id="artistsContainer" class="w-100 flex flex-row">
               <ArtistItem
                 v-for="artiste in artistes"
@@ -250,20 +253,27 @@ main {
 
       @media (min-width: 1250px) {
         .sectionContent {
-          padding-left: 15%;
-          padding-right: 15%;
+          padding-left: 10%;
+          padding-right: 10%;
         }
       }
 
       #rosterSection {
         .sectionContent {
+          .artistesBgImgs {
+            position: absolute;
+            height: calc(100% - 200px) !important;
+
+            filter: grayscale(1);
+          }
         }
 
         .artistItem {
+          z-index: 1;
           flex-grow: 1;
           aspect-ratio: 1;
 
-          margin: 5px;
+          margin: 10px;
         }
       }
     }
