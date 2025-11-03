@@ -3,11 +3,12 @@ import animatedBg from './components/animatedBg/animatedBg.vue'
 import { createApp, onMounted, ref } from 'vue'
 import animatedLink from './components/leftRightAnimated.vue'
 import animatedText from './components/animatedText.vue'
-import carouselComponent from './components/carouselComponent.vue'
+import carouselComponent from './components/autoPhotoCarousel.vue'
 import { ANIMATION } from '@/tools/tools'
 import { useWindowSize } from '@vueuse/core'
 import ArtistItem from './components/artistItem.vue'
 import type { artistesProps } from './components/artistItem.vue'
+import AutoPhotoCarousel from './components/autoPhotoCarousel.vue'
 
 const TITLE_FONT_SIZE = 10
 const LINK_FONT_SIZE = 3
@@ -103,6 +104,8 @@ const artistes: artistesProps[] = [
   { name: 'Mira', description: 'description', imgUrls: [] },
   { name: 'Ronnie', description: 'description', imgUrls: [] },
 ]
+
+const artistesBgImgUrls = ['/src/img/bg-1.jpg']
 </script>
 
 <template>
@@ -130,41 +133,6 @@ const artistes: artistesProps[] = [
           :onHoverLetterAnimation="ANIMATION.grow"
         ></animatedText>
       </div>
-
-      <nav
-        id="navBarContainer"
-        class="navbar flex"
-        :style="{ width: (navHeaderContainersSize ?? 100) + '%' }"
-      >
-        <ul class="w-100 navbar-nav flex flex-row flex-between">
-          <li class="nav-item">
-            <animatedLink
-              :animated="isHeaderAnimationRunning"
-              classes="nav-link underlign"
-              label="Roster"
-              animation="slide-in"
-              @click="innerScrollTo(300)"
-            ></animatedLink>
-          </li>
-          <li class="nav-item">
-            <animatedLink
-              :animated="isHeaderAnimationRunning"
-              classes="nav-link underlign"
-              label="Events"
-              animation="slide-in"
-              @click="innerScrollTo(974)"
-            ></animatedLink>
-          </li>
-          <li class="nav-item">
-            <animatedLink
-              :animated="isHeaderAnimationRunning"
-              classes="nav-link underlign"
-              label="Contact"
-              animation="slide-in"
-            ></animatedLink>
-          </li>
-        </ul>
-      </nav>
     </div>
   </header>
 
@@ -178,23 +146,24 @@ const artistes: artistesProps[] = [
   >
     <div id="container" class="w-100">
       <div id="content" class="w-100">
-        <section id="roster" class="w-100">
-          <h1>Roster</h1>
-          <carouselComponent :items="artistes">
-            <ArtistItem
-              v-for="artiste in artistes"
-              :key="artiste.name"
-              :name="artiste.name"
-              :description="artiste.description"
-              :imgUrls="artiste.imgUrls"
-              :backGroundVideoUrl="artiste.backGroundVideoUrl"
-              class="carouselItem"
-            ></ArtistItem>
-          </carouselComponent>
-        </section>
-        <section id="events">
-          <h1>Events</h1>
-          <carouselComponent :items="[]"></carouselComponent>
+        <section id="rosterSection" class="w-100">
+          <div class="w-100 flex flex-center flex-align-center sectionHeader">
+            <h1>ARTISTES</h1>
+          </div>
+          <div class="w-100 sectionContent flex flex-align-center flex-center">
+            <AutoPhotoCarousel :imgUrls="artistesBgImgUrls"></AutoPhotoCarousel>
+            <div id="artistsContainer" class="w-100 flex flex-row">
+              <ArtistItem
+                v-for="artiste in artistes"
+                :key="artiste.name"
+                :name="artiste.name"
+                :description="artiste.description"
+                :imgUrls="artiste.imgUrls"
+                :backGroundVideoUrl="artiste.backGroundVideoUrl"
+                classes="artistItem"
+              ></ArtistItem>
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -256,23 +225,45 @@ header {
 
 main {
   #container {
-    min-height: 1500px;
+    background-color: $bg-color;
 
     #content {
       section {
         width: 100%;
-        height: calc(100vh - 150px - 15vw);
-        margin-top: 4vw;
+        height: calc(100vh - 150px);
 
-        #carouselContainer {
-          height: 90%;
+        .sectionHeader {
+          background-color: $sectionHeader-bg-color;
+          height: 200px;
+
+          h1 {
+            color: white !important;
+          }
+        }
+
+        .sectionContent {
+          height: calc(100% - 200px);
+          padding-top: 2rem;
+          padding-bottom: 2rem;
         }
       }
 
       @media (min-width: 1250px) {
-        section {
+        .sectionContent {
           padding-left: 15%;
           padding-right: 15%;
+        }
+      }
+
+      #rosterSection {
+        .sectionContent {
+        }
+
+        .artistItem {
+          flex-grow: 1;
+          aspect-ratio: 1;
+
+          margin: 5px;
         }
       }
     }
@@ -286,11 +277,11 @@ footer {
 
   #iconsContainer {
     position: relative;
-    bottom: -75%;
-    width: 200px;
+    bottom: -50%;
+    width: 250px;
     margin: auto;
 
-    background-color: $bg-color;
+    background-color: $sectionHeader-bg-color;
     border-radius: 10px 10px 0px 0px;
 
     transition: bottom ease-in-out 0.1s;
