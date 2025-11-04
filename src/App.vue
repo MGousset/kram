@@ -31,6 +31,8 @@ onMounted(() => {
   document.addEventListener('wheel', updateScrollY)
   window.addEventListener('resize', updateBottomPosition)
 
+  window.addEventListener('resize', centerArtistItems)
+  centerArtistItems()
   innerScrollTo(0)
 })
 
@@ -99,13 +101,41 @@ function updateNavHeaderContainersSize(): void {
   navHeaderContainersSize.value = 45 + (55 * (minTopPosition - topPosition.value)) / minTopPosition
 }
 
+function centerArtistItems(): void {
+  const artistsContainer = document.getElementById('artistsContainer')
+  if (!artistsContainer) {
+    return
+  }
+
+  const artistItems = artistsContainer.getElementsByClassName(
+    'artistItem',
+  ) as HTMLCollectionOf<HTMLDivElement>
+  if (!artistItems.length) {
+    return
+  }
+
+  const itemWidth = artistItems[0]?.clientWidth
+  if (!itemWidth) {
+    return
+  }
+
+  const containerWidth = artistsContainer.clientWidth
+  const minMargin = 20
+  const itemsByRow = Math.floor(containerWidth / (itemWidth + minMargin * 2))
+  const marginLeft = Math.max((containerWidth - itemsByRow * itemWidth) / (itemsByRow + 1) - 1, 5)
+
+  for (const artistItem of artistItems) {
+    artistItem.style.marginLeft = marginLeft + 'px'
+  }
+}
+
 const artistes: artistesProps[] = [
   { name: 'Antmo', description: 'description', imgUrls: [] },
   { name: 'Mira', description: 'description', imgUrls: [] },
   { name: 'Ronnie', description: 'description', imgUrls: [] },
 ]
 
-const artistesBgImgUrls = ['/src/img/bg-1.jpg']
+const artistesBgImgUrls = []
 </script>
 
 <template>
@@ -137,7 +167,7 @@ const artistesBgImgUrls = ['/src/img/bg-1.jpg']
   </header>
 
   <main
-    class="w-100 absolute"
+    class="w-100 relative"
     @mousemove="updateMousePosition"
     @mouseout="resetMousePosition"
     :style="{
@@ -150,12 +180,12 @@ const artistesBgImgUrls = ['/src/img/bg-1.jpg']
           <div class="w-100 flex flex-center flex-align-center sectionHeader">
             <h1>ARTISTES</h1>
           </div>
-          <div class="w-100 sectionContent flex flex-align-center flex-center">
+          <div class="w-100 sectionContainer flex flex-align-center flex-center">
             <AutoPhotoCarousel
               :imgUrls="artistesBgImgUrls"
               containerClasses="artistesBgImgs"
             ></AutoPhotoCarousel>
-            <div id="artistsContainer" class="w-100 flex flex-row">
+            <div id="artistsContainer" class="w-100 h-100 flex flex-row flex-wrap sectionContent">
               <ArtistItem
                 v-for="artiste in artistes"
                 :key="artiste.name"
@@ -233,7 +263,7 @@ main {
     #content {
       section {
         width: 100%;
-        height: calc(100vh - 150px);
+        min-height: calc(100vh - 150px);
 
         .sectionHeader {
           background-color: $sectionHeader-bg-color;
@@ -244,25 +274,28 @@ main {
           }
         }
 
-        .sectionContent {
-          height: calc(100% - 200px);
+        .sectionContainer {
+          position: relative;
+          min-height: calc(100vh - 150px - 200px);
+          background-color: white;
+
           padding-top: 2rem;
           padding-bottom: 2rem;
         }
       }
 
       @media (min-width: 1250px) {
-        .sectionContent {
+        .sectionContainer {
           padding-left: 10%;
           padding-right: 10%;
         }
       }
 
       #rosterSection {
-        .sectionContent {
+        .sectionContainer {
           .artistesBgImgs {
             position: absolute;
-            height: calc(100% - 200px) !important;
+            height: 100%;
 
             filter: grayscale(1);
           }
@@ -270,10 +303,11 @@ main {
 
         .artistItem {
           z-index: 1;
-          flex-grow: 1;
           aspect-ratio: 1;
 
-          margin: 10px;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          min-width: 350px;
         }
       }
     }

@@ -4,8 +4,8 @@ import { onMounted } from 'vue'
 /** Define props */
 type sceneProps = {
   imgUrls: string[]
-  containerClasses?: ''
-  imgClasses?: ''
+  containerClasses?: string
+  imgClasses?: string
 }
 
 const { imgUrls } = defineProps<sceneProps>()
