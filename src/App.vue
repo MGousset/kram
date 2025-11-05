@@ -208,6 +208,9 @@ function centerArtistItems(): void {
               ></ArtistItem>
             </div>
           </div>
+          <carouselArtist class="carouselArtist__class"
+            :artistes="artistes"
+          />
         </section>
       </div>
     </div>
@@ -321,12 +324,12 @@ main {
         }
       }
 
-      #carrouselTest {
-        position: relative;
-        background-color: lime;
-        opacity: 0.3;
+      .carouselArtist__class{
+        //background-color: lime;
+        //opacity: 0.5;
         width: 100%;
-        height: 800px;
+        height: 660px;
+        overflow: hidden;
       }
     }
   }
