@@ -19,16 +19,16 @@ export const artistes: artistesProps[] = [
   },
   {
     name: 'MIRA',
-    description: miraDesc,
+    description: antmoDesc,
     imgUrl: 'src/img/mira.jpeg',
     styles: ['Breakbeat', 'Bailey'],
-    trackIds: [],
+    trackIds: ['253A2190957747', '253A2190957507'],
   },
   {
     name: 'RONNIE',
-    description: ronnieDesc,
+    description: antmoDesc,
     imgUrl: 'src/img/ronnie.JPG',
     styles: ['House', 'Trance'],
-    trackIds: [],
+    trackIds: ['253A2190957747', '253A2190957507'],
   },
 ]

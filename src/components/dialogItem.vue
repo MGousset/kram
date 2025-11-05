@@ -12,15 +12,20 @@ let dialog: HTMLDialogElement
 onMounted(() => {
   dialog = document.getElementById(id) as HTMLDialogElement
   window.addEventListener('click', () => {
-    dialog.close()
+    closeDialog()
   })
-
-  dialog.addEventListener('shown', () => {})
 })
+
+function closeDialog() {
+  dialog.close()
+}
 </script>
 
 <template>
   <dialog :id="id" @click.stop.prevent="">
+    <btn type="btn" class="btn" id="closeButton" @click="closeDialog"
+      ><i i class="bi bi-x"></i
+    ></btn>
     <slot></slot>
   </dialog>
 </template>
@@ -44,6 +49,26 @@ dialog {
 
   border: none;
   border-radius: 5px;
+
+  #closeButton {
+    z-index: 102;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 0.25rem;
+    padding: 0.5rem;
+
+    i::before {
+      font-size: 2rem;
+      color: white;
+      background-color: black;
+    }
+
+    transition: rotate, ease-in-out, 0.3s;
+    &:hover {
+      transform: rotate(-180deg);
+    }
+  }
 }
 
 dialog[open] {
