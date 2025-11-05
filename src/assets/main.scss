@@ -68,6 +68,9 @@
   }
 
   dialog:-internal-dialog-in-top-layer::backdrop {
+    width: 110vw;
+    height: 110vh;
+    transform: translate(-5vw, -5vh);
     pointer-events: none;
     position: fixed;
     background-color: rgba(0, 0, 0, 0.3);
