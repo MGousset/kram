@@ -6,18 +6,38 @@
   font-weight: normal;
   width: 100%;
 
-  // cursor:
-  //   url('./cursor.svg') 20 20,
-  //   default;
-  main {
+  background-color: $bg-color !important;
+  a {
+    text-decoration: none;
+    color: $color !important;
+
+    &:hover,
+    &:active,
+    &:focus {
+      color: $color !important;
+    }
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  span {
+    color: $color !important;
+  }
+
+  .inverse-color {
+    background-color: $bg-color-inverse;
+
     a {
       text-decoration: none;
-      color: $color;
+      color: $color-inverse !important;
 
       &:hover,
       &:active,
       &:focus {
-        color: $color !important;
+        color: $color-inverse !important;
       }
     }
 
@@ -27,8 +47,12 @@
     h3,
     h4,
     span {
-      color: $color !important;
+      color: $color-inverse !important;
     }
+  }
+
+  main {
+    background-color: $bg-color !important;
 
     h1 {
       font-size: 5rem;
@@ -41,29 +65,6 @@
     }
     h4 {
       font-size: 1.5rem;
-    }
-  }
-
-  header,
-  footer {
-    a {
-      text-decoration: none;
-      color: $headerFooterColor !important;
-
-      &:hover,
-      &:active,
-      &:focus {
-        color: $headerFooterColor !important;
-      }
-    }
-
-    p,
-    h1,
-    h2,
-    h3,
-    h4,
-    span {
-      color: $headerFooterColor !important;
     }
   }
 

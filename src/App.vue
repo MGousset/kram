@@ -189,7 +189,7 @@ function centerArtistItems(): void {
     <div id="container" class="w-100">
       <div id="content" class="w-100">
         <section id="rosterSection" class="w-100">
-          <div class="flex flex-center flex-align-center sectionHeader">
+          <div class="flex flex-center flex-align-center sectionHeader inverse-color">
             <h2>ARTISTES</h2>
           </div>
           <div class="w-100 sectionContainer flex flex-align-center flex-center">
@@ -212,7 +212,7 @@ function centerArtistItems(): void {
   </main>
 
   <footer class="flex flex-center flex-align-center w-100">
-    <div id="iconsContainer" class="flex flex-around flex-align-center h-100">
+    <div id="iconsContainer" class="inverse-color flex flex-around flex-align-center h-100">
       <a class="flex flex-center flex-align-center"><i class="bi bi-instagram"></i></a>
       <a class="flex flex-center flex-align-center"><i class="bi bi-envelope-at"></i></a>
     </div>
@@ -258,7 +258,6 @@ header {
 
       .nav-link {
         font-size: v-bind(linkFontSize);
-        color: $color;
         pointer-events: visible;
       }
     }
@@ -268,28 +267,20 @@ header {
 main {
   position: relative;
   #container {
-    background-color: $bg-color;
-
     #content {
       section {
         width: 100%;
         min-height: calc(100vh - 150px);
 
         .sectionHeader {
-          background-color: $sectionHeader-bg-color;
           height: 100px;
           width: v-bind(headerSectionWidth);
           margin: auto;
-
-          h2 {
-            color: white !important;
-          }
         }
 
         .sectionContainer {
           position: relative;
           min-height: calc(100vh - 150px - 100px);
-          background-color: white;
 
           padding-top: 2rem;
           padding-bottom: 2rem;
@@ -337,7 +328,6 @@ footer {
     width: 250px;
     margin: auto;
 
-    background-color: $sectionHeader-bg-color;
     border-radius: 10px 10px 0px 0px;
 
     transition: bottom ease-in-out 0.1s;
