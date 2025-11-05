@@ -39,7 +39,7 @@ function select(index: number){
 
 <template>
   <div id="OverPhotoCarousel">
-    <div id="listArtise">
+    <div id="listArtist">
       <ArtisteListButton
         id="topButton"
         v-for="(artiste, index) in artistes"
@@ -88,7 +88,7 @@ function select(index: number){
   height: 100%;
   z-index: 10;
 
-  #listArtise{
+  #listArtist{
     display: flex;
     justify-content: center;
 
