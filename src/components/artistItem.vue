@@ -52,13 +52,16 @@ onMounted(() => {
           <h2>
             {{ name }}
           </h2>
-          <div id="stylesContainer" class="w-100 flex flex-row flex-start">
-            <div v-for="style in props.styles" :key="style">
-              <span class="styleContainer">{{ style }}</span>
+          <div class="flex flex-between flex-align-end">
+            <div id="stylesContainer" class="w-100 flex flex-row flex-start">
+              <div v-for="style in props.styles" :key="style">
+                <span class="styleContainer">{{ style }}</span>
+              </div>
             </div>
+            <div id="bookButton" class="flex flex-center flex-align-center"><h4>Book</h4></div>
           </div>
         </div>
-        <div id="detailsContainer" class="w-100 flex flex-column">
+        <div id="detailsContainer" class="w-100 flex flex-column flex-around">
           <div id="trackContainer" class="w-100">
             <div id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
@@ -167,14 +170,33 @@ onMounted(() => {
   #dialogContent {
     padding: 2rem;
 
+    #bookButton {
+      cursor: pointer;
+      visibility: visible;
+      width: 150px;
+      height: fit-content;
+      padding: 0.75rem;
+
+      background-color: rgba(255, 255, 255, 1);
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+
+      h4 {
+        margin: 0px;
+        color: black !important;
+      }
+    }
+
     #detailsContainer {
       height: calc(100% - 128px - 2rem);
+      margin-top: 2rem;
 
       #trackContainer,
       #descriptionContainer {
         border-radius: 5px;
         overflow-y: auto;
-        margin-top: 2rem;
+        margin-bottom: 2rem;
         max-height: 50%;
         height: fit-content;
         background-color: rgba(0, 0, 0, 0.5);

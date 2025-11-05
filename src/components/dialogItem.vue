@@ -47,11 +47,7 @@ dialog {
 }
 
 dialog[open] {
-  animation: showed 0.2s ease-in forwards;
-}
-
-dialog:not([open]) {
-  animation: closed 0.2s ease-in forwards;
+  animation: showed 0.1s ease-in forwards;
 }
 
 @keyframes showed {
