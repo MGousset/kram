@@ -8,8 +8,10 @@ import { ANIMATION } from '@/tools/tools'
 import { useWindowSize } from '@vueuse/core'
 import ArtistItem from './components/artistItem.vue'
 import type { artistesProps } from './components/artistItem.vue'
+import type { carouselProps } from './components/carouselArtiste/carouselArtist.vue'
 import AutoPhotoCarousel from './components/autoPhotoCarousel.vue'
 import { artistes } from './const'
+import carouselArtist from './components/carouselArtiste/carouselArtist.vue'
 
 const TITLE_FONT_SIZE = 10
 const LINK_FONT_SIZE = 3
@@ -149,6 +151,8 @@ function centerArtistItems(): void {
     artistItem.style.marginLeft = marginLeft + 'px'
   }
 }
+
+const artistesBgImgUrls = ['/src/img/bg-1.jpg']
 </script>
 
 <template>
@@ -192,20 +196,23 @@ function centerArtistItems(): void {
           <div class="flex flex-center flex-align-center sectionHeader inverse-color">
             <h2>ARTISTES</h2>
           </div>
-          <div class="w-100 sectionContainer flex flex-align-center flex-center">
-            <div id="artistsContainer" class="w-100 h-100 flex flex-row flex-wrap sectionContent">
+          <div class="w-100 sectionContent flex flex-align-center flex-center">
+            <div id="artistsContainer" class="w-100 flex flex-row">
               <ArtistItem
                 v-for="artiste in artistes"
                 :key="artiste.name"
                 :name="artiste.name"
                 :description="artiste.description"
                 :imgUrl="artiste.imgUrl"
-                :styles="artiste.styles"
                 :trackIds="artiste.trackIds"
+                :styles="artiste.styles"
                 classes="artistItem"
               ></ArtistItem>
             </div>
           </div>
+          <carouselArtist id="carrouselTest"
+            :artistes="artistes"
+          />
         </section>
       </div>
     </div>
@@ -284,18 +291,23 @@ main {
 
           padding-top: 2rem;
           padding-bottom: 2rem;
+          .sectionContent {
+            height: calc(100% - 200px);
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+          }
         }
       }
 
       @media (min-width: 1250px) {
-        .sectionContainer {
+        .sectionContent {
           padding-left: 10%;
           padding-right: 10%;
         }
       }
 
       #rosterSection {
-        .sectionContainer {
+        .sectionContent {
           .artistesBgImgs {
             position: absolute;
             height: 100%;
@@ -303,15 +315,14 @@ main {
             filter: grayscale(1);
           }
         }
+      }
 
-        .artistItem {
-          z-index: 1;
-          aspect-ratio: 1;
-
-          margin-top: 10px;
-          margin-bottom: 10px;
-          min-width: 350px;
-        }
+      #carrouselTest {
+        position: relative;
+        background-color: lime;
+        opacity: 0.3;
+        width: 100%;
+        height: 800px;
       }
     }
   }
