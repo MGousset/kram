@@ -125,12 +125,12 @@ function updateSectionHeaderWidth(animationProgression: number): void {
 }
 
 function centerArtistItems(): void {
-  const artistsContainer = document.getElementById('artistsContainer')
-  if (!artistsContainer) {
+  const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
+  if (!artistsMosaiqContainer) {
     return
   }
 
-  const artistItems = artistsContainer.getElementsByClassName(
+  const artistItems = artistsMosaiqContainer.getElementsByClassName(
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
@@ -142,7 +142,7 @@ function centerArtistItems(): void {
     return
   }
 
-  const containerWidth = artistsContainer.clientWidth
+  const containerWidth = artistsMosaiqContainer.clientWidth
   const minMargin = 20
   const itemsByRow = Math.floor(containerWidth / (itemWidth + minMargin * 2))
   const marginLeft = Math.max((containerWidth - itemsByRow * itemWidth) / (itemsByRow + 1) - 1, 5)
@@ -151,8 +151,6 @@ function centerArtistItems(): void {
     artistItem.style.marginLeft = marginLeft + 'px'
   }
 }
-
-const artistesBgImgUrls = ['/src/img/bg-1.jpg']
 </script>
 
 <template>
@@ -196,8 +194,8 @@ const artistesBgImgUrls = ['/src/img/bg-1.jpg']
           <div class="flex flex-center flex-align-center sectionHeader inverse-color">
             <h2>ARTISTES</h2>
           </div>
-          <div class="w-100 sectionContent flex flex-align-center flex-center">
-            <div id="artistsContainer" class="w-100 flex flex-row">
+          <div class="w-100 flex flex-align-center flex-center sectionContainer">
+            <div id="artistsMosaiqContainer" class="w-100 flex flex-row flex-wrap sectionContent">
               <ArtistItem
                 v-for="artiste in artistes"
                 :key="artiste.name"
@@ -210,9 +208,6 @@ const artistesBgImgUrls = ['/src/img/bg-1.jpg']
               ></ArtistItem>
             </div>
           </div>
-          <carouselArtist id="carrouselTest"
-            :artistes="artistes"
-          />
         </section>
       </div>
     </div>
@@ -291,8 +286,8 @@ main {
 
           padding-top: 2rem;
           padding-bottom: 2rem;
+
           .sectionContent {
-            height: calc(100% - 200px);
             padding-top: 2rem;
             padding-bottom: 2rem;
           }
@@ -300,20 +295,29 @@ main {
       }
 
       @media (min-width: 1250px) {
-        .sectionContent {
+        .sectionContainer {
           padding-left: 10%;
           padding-right: 10%;
         }
       }
 
       #rosterSection {
-        .sectionContent {
+        .sectionContainer {
           .artistesBgImgs {
             position: absolute;
             height: 100%;
 
             filter: grayscale(1);
           }
+        }
+
+        .artistItem {
+          z-index: 1;
+          aspect-ratio: 1;
+
+          margin-top: 10px;
+          margin-bottom: 10px;
+          min-width: 350px;
         }
       }
 
@@ -330,6 +334,7 @@ main {
 
 footer {
   position: fixed;
+  z-index: 100;
   bottom: 0px;
   height: 40px;
 
