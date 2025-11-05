@@ -9,6 +9,7 @@ import { useWindowSize } from '@vueuse/core'
 import ArtistItem from './components/artistItem.vue'
 import type { artistesProps } from './components/artistItem.vue'
 import AutoPhotoCarousel from './components/autoPhotoCarousel.vue'
+import { artistes } from './const'
 
 const TITLE_FONT_SIZE = 10
 const LINK_FONT_SIZE = 3
@@ -25,6 +26,8 @@ const topPosition = ref(0)
 const titleFontSize = ref(TITLE_FONT_SIZE)
 const navHeaderContainersSize = ref(100)
 const headerHeight = useWindowSize().height
+const appTopPosition = ref(headerHeight.value)
+const headerSectionWidth = ref(0 + '%')
 
 onMounted(() => {
   document.addEventListener('scroll', updateScrollY)
@@ -32,7 +35,6 @@ onMounted(() => {
   window.addEventListener('resize', updateBottomPosition)
 
   window.addEventListener('resize', centerArtistItems)
-  centerArtistItems()
   innerScrollTo(0)
 })
 
@@ -66,39 +68,58 @@ function updateScrollY(e: Event): void {
 const minVisibleHeight = 150
 const maxHeigh = window.innerHeight
 const minTopPosition = minVisibleHeight - maxHeigh
+
 function updateBottomPosition(): void {
   let newTopPosition = -scrollY.value * 3
   if (newTopPosition <= minTopPosition) {
+    if (topPosition.value <= minTopPosition) {
+      return
+    }
+    centerArtistItems()
     // Stop bg animation if top is reached
     isBgAnimated.value = false
     newTopPosition = minTopPosition
     // Restart header animation
     isHeaderAnimationRunning.value = true
+    appTopPosition.value = headerHeight.value + scrollY.value
   } else {
     // isBgAnimated.value = true // TODO comment for dev
     if (newTopPosition === 0) {
-      isHeaderAnimationRunning.value = true // Restart header animation at start position
+      isHeaderAnimationRunning.value = true // Restarts header animation at start position
     } else {
-      isHeaderAnimationRunning.value = false // stop header animations during transition
+      appTopPosition.value = headerHeight.value + scrollY.value
+      isHeaderAnimationRunning.value = false // Stops header animations during transition
     }
   }
   topPosition.value = newTopPosition
-  headerHeight.value =
-    minVisibleHeight +
-    ((maxHeigh - minVisibleHeight) * (minTopPosition - topPosition.value)) / minTopPosition
+  const animationProgression = (minTopPosition - topPosition.value) / minTopPosition
 
-  updateTitleFontSize()
-  updateNavHeaderContainersSize()
+  updateHeaderHeight(animationProgression)
+  updateTitleFontSize(animationProgression)
+  updateNavHeaderContainersSize(animationProgression)
+  updateSectionHeaderWidth(animationProgression)
 }
 
-function updateTitleFontSize(): void {
-  titleFontSize.value =
-    LINK_FONT_SIZE +
-    ((TITLE_FONT_SIZE - LINK_FONT_SIZE) * (minTopPosition - topPosition.value)) / minTopPosition
+function updateHeaderHeight(animationProgression: number): void {
+  headerHeight.value = minVisibleHeight + (maxHeigh - minVisibleHeight) * animationProgression
 }
 
-function updateNavHeaderContainersSize(): void {
-  navHeaderContainersSize.value = 45 + (55 * (minTopPosition - topPosition.value)) / minTopPosition
+function updateTitleFontSize(animationProgression: number): void {
+  const startValue = TITLE_FONT_SIZE
+  const endValue = LINK_FONT_SIZE
+  titleFontSize.value = endValue + (startValue - endValue) * animationProgression
+}
+
+function updateNavHeaderContainersSize(animationProgression: number): void {
+  const startValue = 100
+  const endValue = 45
+  navHeaderContainersSize.value = endValue + (startValue - endValue) * animationProgression
+}
+
+function updateSectionHeaderWidth(animationProgression: number): void {
+  const startValue = 0
+  const endValue = 100
+  headerSectionWidth.value = endValue + (startValue - endValue) * animationProgression + '%'
 }
 
 function centerArtistItems(): void {
@@ -128,14 +149,6 @@ function centerArtistItems(): void {
     artistItem.style.marginLeft = marginLeft + 'px'
   }
 }
-
-const artistes: artistesProps[] = [
-  { name: 'Antmo', description: 'description', imgUrls: [] },
-  { name: 'Mira', description: 'description', imgUrls: [] },
-  { name: 'Ronnie', description: 'description', imgUrls: [] },
-]
-
-const artistesBgImgUrls = []
 </script>
 
 <template>
@@ -167,32 +180,28 @@ const artistesBgImgUrls = []
   </header>
 
   <main
+    id="main"
     class="w-100 relative"
     @mousemove="updateMousePosition"
     @mouseout="resetMousePosition"
-    :style="{
-      top: maxHeigh + topPosition + (2 * minVisibleHeight * topPosition) / minTopPosition + 'px',
-    }"
+    :style="{ top: appTopPosition + 'px' }"
   >
     <div id="container" class="w-100">
       <div id="content" class="w-100">
         <section id="rosterSection" class="w-100">
-          <div class="w-100 flex flex-center flex-align-center sectionHeader">
-            <h1>ARTISTES</h1>
+          <div class="flex flex-center flex-align-center sectionHeader">
+            <h2>ARTISTES</h2>
           </div>
           <div class="w-100 sectionContainer flex flex-align-center flex-center">
-            <AutoPhotoCarousel
-              :imgUrls="artistesBgImgUrls"
-              containerClasses="artistesBgImgs"
-            ></AutoPhotoCarousel>
             <div id="artistsContainer" class="w-100 h-100 flex flex-row flex-wrap sectionContent">
               <ArtistItem
                 v-for="artiste in artistes"
                 :key="artiste.name"
                 :name="artiste.name"
                 :description="artiste.description"
-                :imgUrls="artiste.imgUrls"
-                :backGroundVideoUrl="artiste.backGroundVideoUrl"
+                :imgUrl="artiste.imgUrl"
+                :styles="artiste.styles"
+                :trackIds="artiste.trackIds"
                 classes="artistItem"
               ></ArtistItem>
             </div>
@@ -257,6 +266,7 @@ header {
 }
 
 main {
+  position: relative;
   #container {
     background-color: $bg-color;
 
@@ -267,16 +277,18 @@ main {
 
         .sectionHeader {
           background-color: $sectionHeader-bg-color;
-          height: 200px;
+          height: 100px;
+          width: v-bind(headerSectionWidth);
+          margin: auto;
 
-          h1 {
+          h2 {
             color: white !important;
           }
         }
 
         .sectionContainer {
           position: relative;
-          min-height: calc(100vh - 150px - 200px);
+          min-height: calc(100vh - 150px - 100px);
           background-color: white;
 
           padding-top: 2rem;

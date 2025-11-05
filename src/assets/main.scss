@@ -31,7 +31,16 @@
     }
 
     h1 {
-      font-size: 5vw;
+      font-size: 5rem;
+    }
+    h2 {
+      font-size: 4rem;
+    }
+    h3 {
+      font-size: 3rem;
+    }
+    h4 {
+      font-size: 1.5rem;
     }
   }
 
@@ -56,5 +65,16 @@
     span {
       color: $headerFooterColor !important;
     }
+  }
+
+  dialog:-internal-dialog-in-top-layer::backdrop {
+    pointer-events: none;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.3);
+    inset: 0px;
+  }
+
+  :focus-visible {
+    outline: -webkit-focus-ring-color auto 0px;
   }
 }

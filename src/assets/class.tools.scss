@@ -12,6 +12,10 @@
   position: absolute;
 }
 
+.sticky {
+  position: sticky;
+}
+
 .flex {
   display: flex;
 }
@@ -54,6 +58,14 @@
 
 .flex-no-wrap {
   flex-wrap: nowrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
 }
 
 .underlign {
