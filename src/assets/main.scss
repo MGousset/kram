@@ -7,6 +7,8 @@
   width: 100%;
 
   a {
+    text-decoration: none;
+
     i {
       transition: font-size ease-in-out 0.07s;
       font-size: 1.5rem;
@@ -20,7 +22,6 @@
   .color {
     background-color: $bg-color !important;
     a {
-      text-decoration: none;
       color: $color !important;
 
       &:hover,
@@ -44,7 +45,6 @@
     background-color: $bg-color-inverse;
 
     a {
-      text-decoration: none;
       color: $color-inverse !important;
 
       &:hover,

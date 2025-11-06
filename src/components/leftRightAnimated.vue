@@ -4,10 +4,7 @@ import { computed } from 'vue'
 /** Define props */
 type sceneProps = {
   animated: boolean
-  href?: string
-  label?: string
-  classes?: string
-  animation?: string
+  animation: string
 }
 
 const props = defineProps<sceneProps>()
@@ -21,8 +18,7 @@ const state = computed(() => (props.animated ? 'running' : 'paused'))
 </script>
 
 <template>
-  <a v-if="href" :class="props.classes" :href="props.href">{{ label }}</a>
-  <p v-else :class="props.classes">{{ label }}</p>
+  <slot></slot>
 </template>
 
 <style lang="scss">

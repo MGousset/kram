@@ -7,6 +7,11 @@ export type Props = {
 }
 
 const { id } = defineProps<Props>()
+
+const emits = defineEmits<{
+  close: []
+}>()
+
 let dialog: HTMLDialogElement
 
 onMounted(() => {
@@ -17,15 +22,16 @@ onMounted(() => {
 })
 
 function closeDialog() {
+  emits('close')
   dialog.close()
 }
 </script>
 
 <template>
   <dialog :id="id" @click.stop.prevent="">
-    <btn type="btn" class="btn" id="closeButton" @click="closeDialog">
+    <button type="button" class="btn" id="closeButton" @click="closeDialog">
       <i class="fa fa-times" aria-hidden="true"></i>
-    </btn>
+    </button>
     <slot></slot>
   </dialog>
 </template>
@@ -76,7 +82,7 @@ dialog {
     transform: translate(-5vw, -5vh);
     pointer-events: none;
     position: fixed;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: rgba(0, 0, 0, 0.8);
     inset: 0px;
   }
 }

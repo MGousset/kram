@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ANIMATION, growElementText, randomLetters } from '@/tools/tools'
-import { contain } from 'three/src/extras/TextureUtils.js'
 import { onMounted, ref } from 'vue'
 
 const MULTIPLIER = 1.2

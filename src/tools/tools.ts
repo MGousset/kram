@@ -29,9 +29,9 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } | nul
 export function generateRandomColor(
   mix: THREE.Color = new THREE.Color(255, 255, 255),
 ): THREE.Color {
-  let red = Math.random() * 180
-  let green = Math.random() * 180
-  let blue = Math.random() * 180
+  let red = Math.random() * 255
+  let green = Math.random() * 255
+  let blue = Math.random() * 255
 
   // mix the color
   if (mix != null) {
@@ -40,7 +40,9 @@ export function generateRandomColor(
     blue = (blue + mix.b) / 2
   }
 
-  return new THREE.Color(red, green, blue)
+  const newColor = new THREE.Color(red, green, blue)
+  console.log(newColor)
+  return newColor
 }
 
 export function growElementText(element: HTMLElement, multiplier: number): string {

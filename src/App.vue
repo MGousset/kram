@@ -1,203 +1,183 @@
 <script setup lang="ts">
-import animatedBg from './components/animatedBg/animatedBg.vue'
-import { onMounted, ref } from 'vue'
-import animatedText from './components/animatedText.vue'
+import * as THREE from 'three'
+import { defineAsyncComponent, onMounted, ref, type Ref } from 'vue'
 import { ANIMATION } from '@/tools/tools'
-import { useWindowSize } from '@vueuse/core'
-import ArtistItem from './components/artistItem.vue'
-import { artistes } from './const'
-import RotateOnMouseOver from './components/rotateOnMouseOver.vue'
+import { artistes, colorByImageUrl } from './const'
 
-const TITLE_FONT_SIZE = 10
-const LINK_FONT_SIZE = 3
+import AnimatedText from './components/animatedText.vue'
+import LeftRightAnimated from './components/leftRightAnimated.vue'
+import AnimatedBg from './components/animatedBg/animatedBg.vue'
 
-const linkFontSize = LINK_FONT_SIZE + 'vw'
-const navLeftMargin = TITLE_FONT_SIZE / 10 + 'vw'
+const ArtistItem = defineAsyncComponent(() =>
+  import('./components/artistItem.vue').then((comp) => {
+    afterLoaded()
+    return comp
+  }),
+)
 
-const mousePos = ref({ x: -1, y: -1 })
-const scrollY = ref(0)
-const isBgAnimated = ref(false) // TODO put false for dev
+const isBgAnimated = ref(true) // TODO put false for dev
 
-const isHeaderAnimationRunning = ref(true)
-const topPosition = ref(0)
-const titleFontSize = ref(TITLE_FONT_SIZE)
-const navHeaderContainersSize = ref(100)
-const headerHeight = useWindowSize().height
-const appTopPosition = ref(headerHeight.value)
-const headerSectionWidth = ref(0 + '%')
+const headerTopValue = ref(50)
+const navbarTopValue = ref(60)
+const linkVisibility = ref('hidden') as Ref<'hidden' | 'visible'>
 
-innerScrollTo(0)
+const defaultbgColors = {
+  color1: new THREE.Color(247, 175, 193),
+  color2: new THREE.Color(246, 137, 139),
+}
+const bgColors = ref(defaultbgColors)
+
+async function afterLoaded(): Promise<void> {
+  await centerArtistItems()
+
+  linkVisibility.value = 'visible'
+}
 
 onMounted(() => {
+  innerScrollTo(0)
   document.addEventListener('scroll', updateScrollY)
   document.addEventListener('wheel', updateScrollY)
-  window.addEventListener('resize', updateBottomPosition)
+  window.addEventListener('resize', updateScrollY)
 
   window.addEventListener('resize', centerArtistItems)
-  centerArtistItems()
 })
 
 function innerScrollTo(position: number) {
   scrollTo({ top: position })
 }
 
-//Define Functions
-async function updateMousePosition(e: MouseEvent): Promise<void> {
-  mousePos.value = {
-    x: e.x,
-    y: e.y,
-  }
-}
-
-async function resetMousePosition(): Promise<void> {
-  mousePos.value = {
-    x: -1,
-    y: -1,
-  }
-}
-
-function updateScrollY(e: Event): void {
-  scrollY.value = window.scrollY
-  if (scrollY.value === 0) {
-    isHeaderAnimationRunning.value = true
-  }
-  updateBottomPosition()
-}
-
-const minVisibleHeight = 150
+const minVisibleHeight = 0
 const maxHeigh = window.innerHeight
-const minTopPosition = minVisibleHeight - maxHeigh
+const endAnimation = maxHeigh - minVisibleHeight
 
-function updateBottomPosition(): void {
-  let newTopPosition = -scrollY.value * 3
-  if (newTopPosition <= minTopPosition) {
-    // Stop bg animation if top is reached
-    isBgAnimated.value = false
-    newTopPosition = minTopPosition
-    // Restart header animation
-    isHeaderAnimationRunning.value = true
+function updateScrollY(): void {
+  const animationProgression = Math.min(window.scrollY / endAnimation, 1)
 
-    if (topPosition.value > minTopPosition) {
-      // Compute app top position
-      appTopPosition.value = headerHeight.value - newTopPosition / 3
-    }
-  } else {
-    // isBgAnimated.value = true // TODO comment for dev
-    if (newTopPosition === 0) {
-      isHeaderAnimationRunning.value = true // Restarts header animation at start position
-    } else {
-      // Compute app top position
-      appTopPosition.value = headerHeight.value + scrollY.value
-
-      isHeaderAnimationRunning.value = false // Stops header animations during transition
-    }
-  }
-  topPosition.value = newTopPosition
-  const animationProgression = (minTopPosition - topPosition.value) / minTopPosition
-
-  updateHeaderHeight(animationProgression)
-  updateTitleFontSize(animationProgression)
-  updateNavHeaderContainersSize(animationProgression)
-  updateSectionHeaderWidth(animationProgression)
+  updateHeaderTopValue(animationProgression)
+  updateNavbarTopValue(animationProgression)
 }
 
-function updateHeaderHeight(animationProgression: number): void {
-  headerHeight.value = minVisibleHeight + (maxHeigh - minVisibleHeight) * animationProgression
+const startHeaderTopValue = 50
+const endHeaderTopValue = -10
+function updateHeaderTopValue(animationProgression: number): void {
+  headerTopValue.value =
+    startHeaderTopValue + (endHeaderTopValue - startHeaderTopValue) * animationProgression
 }
 
-function updateTitleFontSize(animationProgression: number): void {
-  const startValue = TITLE_FONT_SIZE
-  const endValue = LINK_FONT_SIZE
-  titleFontSize.value = endValue + (startValue - endValue) * animationProgression
+const startNavbarTopValue = 60
+const endNavbarTopValue = 0
+function updateNavbarTopValue(animationProgression: number): void {
+  navbarTopValue.value =
+    startNavbarTopValue + (endNavbarTopValue - startNavbarTopValue) * animationProgression
 }
 
-function updateNavHeaderContainersSize(animationProgression: number): void {
-  const startValue = 100
-  const endValue = 45
-  navHeaderContainersSize.value = endValue + (startValue - endValue) * animationProgression
-}
-
-function updateSectionHeaderWidth(animationProgression: number): void {
-  const startValue = 0
-  const endValue = 100
-  headerSectionWidth.value = endValue + (startValue - endValue) * animationProgression + '%'
-}
-
-function centerArtistItems(): void {
+async function centerArtistItems(): Promise<void> {
   const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
   if (!artistsMosaiqContainer) {
-    return
+    await new Promise((f) => setTimeout(f, 1000))
+    return centerArtistItems()
   }
 
   const artistItems = artistsMosaiqContainer.getElementsByClassName(
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
-    return
+    await new Promise((f) => setTimeout(f, 1000))
+    return centerArtistItems()
   }
 
-  const itemWidth = artistItems[0]?.clientWidth
-  if (!itemWidth) {
-    return
-  }
+  const minWidth = 300
+  const maxWidth = 450
+  const minMargin = 16
+  const containerWidth = artistsMosaiqContainer.clientWidth - minMargin
 
-  const containerWidth = artistsMosaiqContainer.clientWidth
-  const minMargin = 20
   const itemsByRow = Math.min(
-    Math.floor(containerWidth / (itemWidth + minMargin * 2)),
+    Math.floor(containerWidth / (minWidth + minMargin * 2)),
     artistItems.length,
   )
-  const marginLeft = Math.max((containerWidth - itemsByRow * itemWidth) / (itemsByRow + 1) - 1, 5)
+
+  const itemWidth = Math.min(containerWidth / itemsByRow - minMargin, maxWidth)
+  const marginLeft = Math.max(
+    (containerWidth - itemsByRow * itemWidth) / (itemsByRow + 1),
+    minMargin,
+  )
 
   for (const artistItem of artistItems) {
+    artistItem.style.width = itemWidth + 'px'
     artistItem.style.marginLeft = marginLeft + 'px'
   }
+}
+
+function changeBgColors(p: { id?: string; isClicked: boolean }): void {
+  const { id, isClicked } = p
+  if (isClicked) {
+    return
+  }
+
+  if (!id) {
+    bgColors.value = defaultbgColors
+    return
+  }
+
+  const colors = colorByImageUrl.get(id)
+  if (!colors) {
+    return
+  }
+  bgColors.value = colors
 }
 </script>
 
 <template>
-  <header class="w-100 color flex flex-center" :style="{ height: headerHeight + 'px' }">
-    <animatedBg :animated="isBgAnimated"></animatedBg>
-    <div id="layout" class="h-100 w-100 no-events"></div>
-    <div
-      id="navHeader"
-      class="w-100 flex flex-row flex-wrap flex-between flex-align-center no-events"
-    >
+  <div
+    id="navBar"
+    class="fixed flex flex-row flex-between flex-align-end"
+    :style="{ top: (navbarTopValue ?? 60) + '%', visibility: linkVisibility }"
+  >
+    <LeftRightAnimated :animated="linkVisibility === 'visible'" animation="leftRight">
+      <a @click="() => innerScrollTo(0)"><h2>KRAM</h2></a>
+    </LeftRightAnimated>
+    <LeftRightAnimated :animated="linkVisibility === 'visible'" animation="rightLeft">
+      <a @click="() => innerScrollTo(1080)"><h2>ARTISTES</h2></a>
+    </LeftRightAnimated>
+  </div>
+  <header class="color">
+    <AnimatedBg
+      :animated="isBgAnimated"
+      :bgColors="bgColors"
+      class="h-100 w-100 absolute"
+    ></AnimatedBg>
+    <div id="layout" class="h-100 w-100 absolute no-events"></div>
+    <div id="navHeader" class="w-100 flex" :style="{ top: (headerTopValue ?? 50) + '%' }">
       <div
-        id="titleContainer"
-        class="flex flex-center"
-        :style="{ width: (navHeaderContainersSize ?? 100) + '%' }"
+        id="titleContent"
+        class="w-100 flex flex-center flex-align-center"
         @click="() => innerScrollTo(0)"
       >
-        <animatedText
-          :animated="isHeaderAnimationRunning"
-          :containerSize="navHeaderContainersSize"
+        <AnimatedText
+          :animated="true"
           label="KRAM AGENCY"
-          :fontSize="titleFontSize"
-          containerClasses="titleContainer"
+          :fontSize="9"
+          containerClasses="titleContent"
           textClasses="title"
           :onMontedAnimation="ANIMATION.randomstep"
           :onHoverLetterAnimation="ANIMATION.grow"
-        ></animatedText>
+        ></AnimatedText>
       </div>
     </div>
   </header>
 
-  <main
-    id="main"
-    class="w-100 relative"
-    @mousemove="updateMousePosition"
-    @mouseout="resetMousePosition"
-    :style="{ top: appTopPosition + 'px' }"
-  >
-    <div id="container" class="w-100 colored">
+  <main id="main" class="w-100 relative">
+    <div id="container" class="w-100">
       <div id="content" class="w-100">
         <section id="rosterSection" class="w-100">
-          <div class="flex flex-center flex-align-center sectionHeader inverse-color">
-            <h2>ARTISTES</h2>
-          </div>
-          <div class="w-100 color flex flex-align-center flex-center sectionContainer">
-            <div id="artistsMosaiqContainer" class="w-100 flex flex-row flex-wrap sectionContent">
+          <div class="w-100 flex flex-center flex-align-center flex-column sectionContainer">
+            <div class="flex flex-center flex-align-center sectionHeader flex-1">
+              <h2>ARTISTES</h2>
+            </div>
+            <div
+              id="artistsMosaiqContainer"
+              class="w-100 flex flex-row flex-align-center flex-wrap sectionContent flex-2"
+            >
               <ArtistItem
                 v-for="artiste in artistes"
                 :key="artiste.name"
@@ -208,19 +188,17 @@ function centerArtistItems(): void {
                 :network="artiste.network"
                 :trackIds="artiste.trackIds"
                 classes="artistItem"
+                @focus-image="(p: { id: string; isClicked: boolean }) => changeBgColors(p)"
               ></ArtistItem>
             </div>
           </div>
-          <carouselArtist class="carouselArtist__class"
-            :artistes="artistes"
-          />
         </section>
       </div>
     </div>
   </main>
 
   <footer class="flex flex-center flex-align-center w-100">
-    <div id="iconsContainer" class="inverse-color flex flex-around flex-align-center h-100">
+    <div id="iconsContainer" class="flex flex-around flex-align-center h-100">
       <a
         class="flex flex-center flex-align-center"
         target="_blank"
@@ -241,79 +219,98 @@ function centerArtistItems(): void {
 <style lang="scss">
 @import './assets/main.scss';
 
+#navBar {
+  z-index: 100;
+  width: 25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem 1rem 2rem;
+
+  a {
+    cursor: pointer;
+    margin-right: 1rem;
+
+    color: rgba(255, 255, 255, 0.7);
+
+    &:hover {
+      color: rgba(255, 255, 255, 1);
+    }
+  }
+}
+
 header {
-  z-index: 10;
-  position: fixed;
+  height: 100vh;
+  z-index: 0;
+  position: sticky;
+  top: 0px;
 
   p {
     margin: 0px;
   }
 
   #layout {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.2);
+    z-index: -9;
+    background-color: rgba(0, 0, 0, 0.4);
     background-image: url('../assets/noise.svg');
   }
 
   #navHeader {
-    position: absolute;
-    transform: translateY(-50%);
-    top: 50%;
+    transform: translate(0, -50%);
+    position: relative;
 
-    padding: 15px 50px 15px 50px;
+    #titleContent {
+      padding: 5rem;
 
-    .title {
-      white-space: pre;
-      pointer-events: visible;
-      cursor: pointer;
-      margin: 0;
-      padding: 0;
-    }
-
-    .navbar {
-      margin-left: v-bind(navLeftMargin);
-      background: none;
-
-      .nav-link {
-        font-size: v-bind(linkFontSize);
+      .title {
+        white-space: pre;
         pointer-events: visible;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
       }
     }
   }
 }
 
 main {
-  position: relative;
+  z-index: 1;
   #container {
     #content {
       section {
-        width: 100%;
-        min-height: calc(100vh - 150px);
-
-        .sectionHeader {
-          height: 100px;
-          width: v-bind(headerSectionWidth);
-          margin: auto;
-        }
-
         .sectionContainer {
           position: relative;
-          min-height: calc(100vh - 150px - 100px);
+          height: 100vh;
+          background-color: rgb(0, 0, 0, 0.3);
+          padding-bottom: 3rem;
 
-          padding-top: 2rem;
-          padding-bottom: 2rem;
+          .sectionHeader {
+            color: $color;
+            height: 9rem;
+            margin: auto;
+
+            h2 {
+              padding-top: 3rem;
+            }
+          }
 
           .sectionContent {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-          }
-        }
-      }
+            border-radius: 5px;
+            overflow-y: auto;
 
-      @media (min-width: 1250px) {
-        .sectionContainer {
-          padding-left: 10%;
-          padding-right: 10%;
+            &::-webkit-scrollbar {
+              width: 12px; /* width of the entire scrollbar */
+            }
+
+            &::-webkit-scrollbar-track {
+              background: #181818; /* color of the tracking area */
+            }
+
+            &::-webkit-scrollbar-thumb {
+              background-color: white; /* color of the scroll thumb */
+              border-radius: 5px; /* roundness of the scroll thumb */
+              border: 3px solid #181818; /* creates padding around scroll thumb */
+            }
+          }
         }
       }
 
@@ -330,16 +327,15 @@ main {
         .artistItem {
           z-index: 1;
           aspect-ratio: 1;
-
+          height: fit-content;
           margin-top: 10px;
           margin-bottom: 10px;
-          min-width: 300px;
 
-          transform: rotate3d(1, 1, 0, 15deg);
+          // transform: rotate3d(1, 1, 0, 15deg);
         }
       }
 
-      .carouselArtist__class{
+      .carouselArtist__class {
         //background-color: lime;
         //opacity: 0.5;
         width: 100%;
@@ -365,15 +361,19 @@ footer {
     border-radius: 10px 10px 0px 0px;
 
     transition: bottom ease-in-out 0.1s;
+    transition: background-color ease-in-out 0.1s;
+    background-color: rgba(255, 255, 255, 0.7);
 
     &:hover {
       bottom: 0%;
+      background-color: rgba(255, 255, 255, 1);
       a {
         bottom: 0%;
       }
     }
 
     a {
+      color: $color-inverse;
       transition: bottom ease-in-out 0.2s;
       position: relative;
       bottom: -100%;

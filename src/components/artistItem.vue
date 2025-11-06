@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import SoundCloudSong from './soundCloudSong.vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import DialogItem from './dialogItem.vue'
+
+const SoundCloudSong = defineAsyncComponent(() =>
+  import('./soundCloudSong.vue').then((comp) => {
+    afterLoaded()
+    return comp
+  }),
+)
 
 /** Define props */
 export type artistesProps = {
@@ -17,6 +23,16 @@ export type artistesProps = {
 
 const props = defineProps<artistesProps>()
 
+/** Define Events */
+
+const emits = defineEmits({
+  focusImage: ({ id, isClicked }) => {
+    return !isClicked
+  },
+})
+
+const isTrackLoaded = ref(false)
+
 const backgroundImage = `url(${props.imgUrl})`
 const modalId = `ArtisteItem/${props.name}`
 let dialog: HTMLDialogElement
@@ -27,13 +43,57 @@ function focus(): void {
   }
 }
 
+const isTrackLoadedById = new Map<string, boolean>()
+for (const trackId of props.trackIds) {
+  isTrackLoadedById.set(trackId, false)
+}
+
+function setTrackAsLoaded(id: string) {
+  isTrackLoadedById.set(id, true)
+}
+
+async function afterLoaded(): Promise<void> {
+  for (const trackId of props.trackIds) {
+    const track = document.getElementById(trackId)
+
+    if (!track) {
+      await new Promise((f) => setTimeout(f, 1000))
+      return afterLoaded()
+    }
+
+    ;(track as HTMLIFrameElement).onload = () => {
+      setTrackAsLoaded(trackId)
+    }
+  }
+
+  checkIfAllLoaded()
+}
+
+async function checkIfAllLoaded(): Promise<void> {
+  for (const trackId of props.trackIds) {
+    if (!isTrackLoadedById.get(trackId)) {
+      await new Promise((f) => setTimeout(f, 1000))
+      return checkIfAllLoaded()
+    }
+  }
+
+  isTrackLoaded.value = true
+}
+
 onMounted(() => {
   dialog = document.getElementById(modalId) as HTMLDialogElement
 })
 </script>
 
 <template>
-  <div id="artistContainer" :class="classes" @click.stop.prevent="focus" class="color">
+  <div
+    id="artistContainer"
+    :class="classes"
+    @mouseenter="$emit('focusImage', { id: imgUrl, isClicked: dialog.open })"
+    @mouseleave="$emit('focusImage', { isClicked: dialog.open })"
+    @click.stop.prevent="focus"
+    class="color"
+  >
     <div id="seeMoreButton" class="flex flex-center inverse-color"><h4>Show</h4></div>
     <div id="infosContainer" class="w-100 flex flex-column">
       <h2>
@@ -44,7 +104,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <DialogItem :id="modalId">
+  <DialogItem :id="modalId" @close="$emit('focusImage', { isClicked: false })">
     <div id="dialogContainer" class="w-100 h-100 flex flex-column">
       <div id="infosContainer" class="color">
         <div id="infosContent" class="h-100 w-100 flex flex-column flex-between">
@@ -91,7 +151,7 @@ onMounted(() => {
         <div id="detailsContent" class="h-100 w-100 flex flex-column">
           <div id="trackContainer" class="w-100">
             <h3>Mix</h3>
-            <div id="trackContent" class="w-100 flex flex-column">
+            <div v-show="isTrackLoaded" id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
                 v-for="id in props.trackIds"
                 :key="id"
@@ -99,6 +159,7 @@ onMounted(() => {
                 classes="trackItem"
               ></SoundCloudSong>
             </div>
+            <div id="loading" v-show="!isTrackLoaded"></div>
           </div>
           <div id="descriptionContainer" class="w-100">
             <h3>Description</h3>
@@ -127,7 +188,7 @@ onMounted(() => {
   background-repeat: no-repeat;
   border-radius: 5px;
 
-  filter: grayscale(0.5);
+  filter: grayscale(1);
   &:hover {
     filter: grayscale(0);
     background-size: 140%;
@@ -147,13 +208,13 @@ onMounted(() => {
     transition: visibility, ease-in-out, 0s;
 
     visibility: hidden;
-    width: 150px;
+    width: 10rem;
     height: auto;
     padding: 0.75rem;
 
     position: absolute;
     margin: auto;
-    top: 70%;
+    top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
 
@@ -300,6 +361,10 @@ onMounted(() => {
         }
       }
 
+      #loading {
+        background-image: 'src/img/loading.gif';
+      }
+
       #descriptionContainer {
         #descriptionContent {
           overflow-y: auto;
@@ -310,8 +375,8 @@ onMounted(() => {
 }
 
 dialog:-internal-dialog-in-top-layer::backdrop {
-  background-image: v-bind(backgroundImage);
+  //background-image: v-bind(backgroundImage);
   background-size: 100% 100%;
-  filter: blur(10px) grayscale(0.4) contrast(0.7);
+  filter: blur(5px) grayscale(0.2) contrast(0.8);
 }
 </style>

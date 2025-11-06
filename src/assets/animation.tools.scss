@@ -1,9 +1,19 @@
-@keyframes slide-in {
+@keyframes leftRight {
   from {
     margin-left: -5%;
   }
 
   to {
     margin-left: 5%;
+  }
+}
+
+@keyframes rightLeft {
+  from {
+    margin-right: -5%;
+  }
+
+  to {
+    margin-right: 5%;
   }
 }

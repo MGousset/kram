@@ -1,4 +1,5 @@
 import type { artistesProps } from './components/artistItem.vue'
+import * as THREE from 'three'
 
 const antmoDesc = [
   'Depuis une décennie, Antmo, artiste polyvalent et cofondateur du collectif KRAM, explore les multiples facettes de la musique électronique.',
@@ -65,3 +66,27 @@ export const artistes: artistesProps[] = [
     cutPercent: '32',
   },
 ]
+
+export const colorByImageUrl: Map<string, { color1: THREE.Color; color2: THREE.Color }> = new Map([
+  [
+    'src/img/antmo.jpg',
+    {
+      color1: new THREE.Color(156 + 50, 221 + 50, 214 + 50),
+      color2: new THREE.Color(0 + 50, 142 + 50, 145 + 50),
+    },
+  ],
+  [
+    'src/img/mira.jpeg',
+    {
+      color1: new THREE.Color(111 + 50, 118 + 50, 42 + 50),
+      color2: new THREE.Color(44 + 50, 71 + 50, 0 + 50),
+    },
+  ],
+  [
+    'src/img/ronnie.JPG',
+    {
+      color1: new THREE.Color(180 + 50, 124 + 50, 146 + 50),
+      color2: new THREE.Color(166 + 50, 111 + 50, 140 + 50),
+    },
+  ],
+])
