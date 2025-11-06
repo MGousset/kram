@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import animatedBg from './components/animatedBg/animatedBg.vue'
-import { createApp, onMounted, ref } from 'vue'
-import animatedLink from './components/leftRightAnimated.vue'
+import { onMounted, ref } from 'vue'
 import animatedText from './components/animatedText.vue'
-import carouselComponent from './components/autoPhotoCarousel.vue'
 import { ANIMATION } from '@/tools/tools'
 import { useWindowSize } from '@vueuse/core'
 import ArtistItem from './components/artistItem.vue'
-import type { artistesProps } from './components/artistItem.vue'
-import type { carouselProps } from './components/carouselArtiste/carouselArtist.vue'
-import AutoPhotoCarousel from './components/autoPhotoCarousel.vue'
 import { artistes } from './const'
-import carouselArtist from './components/carouselArtiste/carouselArtist.vue'
+import RotateOnMouseOver from './components/rotateOnMouseOver.vue'
 
 const TITLE_FONT_SIZE = 10
 const LINK_FONT_SIZE = 3
@@ -31,13 +26,15 @@ const headerHeight = useWindowSize().height
 const appTopPosition = ref(headerHeight.value)
 const headerSectionWidth = ref(0 + '%')
 
+innerScrollTo(0)
+
 onMounted(() => {
   document.addEventListener('scroll', updateScrollY)
   document.addEventListener('wheel', updateScrollY)
   window.addEventListener('resize', updateBottomPosition)
 
   window.addEventListener('resize', centerArtistItems)
-  innerScrollTo(0)
+  centerArtistItems()
 })
 
 function innerScrollTo(position: number) {
@@ -74,22 +71,24 @@ const minTopPosition = minVisibleHeight - maxHeigh
 function updateBottomPosition(): void {
   let newTopPosition = -scrollY.value * 3
   if (newTopPosition <= minTopPosition) {
-    if (topPosition.value <= minTopPosition) {
-      return
-    }
-    centerArtistItems()
     // Stop bg animation if top is reached
     isBgAnimated.value = false
     newTopPosition = minTopPosition
     // Restart header animation
     isHeaderAnimationRunning.value = true
-    appTopPosition.value = headerHeight.value + scrollY.value
+
+    if (topPosition.value > minTopPosition) {
+      // Compute app top position
+      appTopPosition.value = headerHeight.value - newTopPosition / 3
+    }
   } else {
     // isBgAnimated.value = true // TODO comment for dev
     if (newTopPosition === 0) {
       isHeaderAnimationRunning.value = true // Restarts header animation at start position
     } else {
+      // Compute app top position
       appTopPosition.value = headerHeight.value + scrollY.value
+
       isHeaderAnimationRunning.value = false // Stops header animations during transition
     }
   }
@@ -144,7 +143,10 @@ function centerArtistItems(): void {
 
   const containerWidth = artistsMosaiqContainer.clientWidth
   const minMargin = 20
-  const itemsByRow = Math.floor(containerWidth / (itemWidth + minMargin * 2))
+  const itemsByRow = Math.min(
+    Math.floor(containerWidth / (itemWidth + minMargin * 2)),
+    artistItems.length,
+  )
   const marginLeft = Math.max((containerWidth - itemsByRow * itemWidth) / (itemsByRow + 1) - 1, 5)
 
   for (const artistItem of artistItems) {
@@ -154,7 +156,7 @@ function centerArtistItems(): void {
 </script>
 
 <template>
-  <header class="w-100 flex flex-center" :style="{ height: headerHeight + 'px' }">
+  <header class="w-100 color flex flex-center" :style="{ height: headerHeight + 'px' }">
     <animatedBg :animated="isBgAnimated"></animatedBg>
     <div id="layout" class="h-100 w-100 no-events"></div>
     <div
@@ -188,13 +190,13 @@ function centerArtistItems(): void {
     @mouseout="resetMousePosition"
     :style="{ top: appTopPosition + 'px' }"
   >
-    <div id="container" class="w-100">
+    <div id="container" class="w-100 colored">
       <div id="content" class="w-100">
         <section id="rosterSection" class="w-100">
           <div class="flex flex-center flex-align-center sectionHeader inverse-color">
             <h2>ARTISTES</h2>
           </div>
-          <div class="w-100 flex flex-align-center flex-center sectionContainer">
+          <div class="w-100 color flex flex-align-center flex-center sectionContainer">
             <div id="artistsMosaiqContainer" class="w-100 flex flex-row flex-wrap sectionContent">
               <ArtistItem
                 v-for="artiste in artistes"
@@ -202,8 +204,9 @@ function centerArtistItems(): void {
                 :name="artiste.name"
                 :description="artiste.description"
                 :imgUrl="artiste.imgUrl"
-                :trackIds="artiste.trackIds"
                 :styles="artiste.styles"
+                :network="artiste.network"
+                :trackIds="artiste.trackIds"
                 classes="artistItem"
               ></ArtistItem>
             </div>
@@ -215,15 +218,25 @@ function centerArtistItems(): void {
 
   <footer class="flex flex-center flex-align-center w-100">
     <div id="iconsContainer" class="inverse-color flex flex-around flex-align-center h-100">
-      <a class="flex flex-center flex-align-center"><i class="bi bi-instagram"></i></a>
-      <a class="flex flex-center flex-align-center"><i class="bi bi-envelope-at"></i></a>
+      <a
+        class="flex flex-center flex-align-center"
+        target="_blank"
+        href="https://www.instagram.com/krambzh/"
+      >
+        <i class="fa fa-instagram" aria-hidden="true"></i>
+      </a>
+      <a
+        class="flex flex-center flex-align-center"
+        target="_blank"
+        href="mailto:contact@kram-agency.com"
+        ><i class="fa fa-envelope" aria-hidden="true"></i
+      ></a>
     </div>
   </footer>
 </template>
 
 <style lang="scss">
 @import './assets/main.scss';
-@import '../node_modules/bootstrap-icons/font/bootstrap-icons.min.css';
 
 header {
   z-index: 10;
@@ -317,7 +330,9 @@ main {
 
           margin-top: 10px;
           margin-bottom: 10px;
-          min-width: 350px;
+          min-width: 300px;
+
+          transform: rotate3d(1, 1, 0, 15deg);
         }
       }
 
@@ -364,7 +379,6 @@ footer {
 
       i {
         transition: font-size ease-in-out 0.07s;
-
         font-size: 1.5rem;
 
         &:hover {

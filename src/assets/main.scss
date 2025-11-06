@@ -6,25 +6,38 @@
   font-weight: normal;
   width: 100%;
 
-  background-color: $bg-color !important;
   a {
-    text-decoration: none;
-    color: $color !important;
+    i {
+      transition: font-size ease-in-out 0.07s;
+      font-size: 1.5rem;
 
-    &:hover,
-    &:active,
-    &:focus {
-      color: $color !important;
+      &:hover {
+        font-size: 1.8rem;
+      }
     }
   }
 
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  span {
-    color: $color !important;
+  .color {
+    background-color: $bg-color !important;
+    a {
+      text-decoration: none;
+      color: $color !important;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: $color !important;
+      }
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    span {
+      color: $color !important;
+    }
   }
 
   .inverse-color {
@@ -52,8 +65,6 @@
   }
 
   main {
-    background-color: $bg-color !important;
-
     h1 {
       font-size: 5rem;
     }
@@ -66,16 +77,6 @@
     h4 {
       font-size: 1.5rem;
     }
-  }
-
-  dialog:-internal-dialog-in-top-layer::backdrop {
-    width: 110vw;
-    height: 110vh;
-    transform: translate(-5vw, -5vh);
-    pointer-events: none;
-    position: fixed;
-    background-color: rgba(0, 0, 0, 0.3);
-    inset: 0px;
   }
 
   :focus-visible {

@@ -10,6 +10,7 @@ export type artistesProps = {
   imgUrl: string
   styles: string[]
   trackIds: string[]
+  network?: { insta?: string; soundCloud?: string }
   classes?: string
 }
 
@@ -31,9 +32,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="artistContainer" :class="classes" @click.stop.prevent="focus">
-    <div id="seeMoreButton" class="flex flex-center"><h4>Voir plus</h4></div>
-    <div class="w-100 flex flex-column infosContainer">
+  <div id="artistContainer" :class="classes" @click.stop.prevent="focus" class="color">
+    <div id="seeMoreButton" class="flex flex-center inverse-color"><h4>Show</h4></div>
+    <div id="infosContainer" class="w-100 flex flex-column">
       <h2>
         {{ name }}
       </h2>
@@ -44,36 +45,65 @@ onMounted(() => {
   </div>
   <DialogItem :id="modalId">
     <div id="dialogContainer" class="w-100 h-100 flex flex-column">
-      <div class="infosContainer">
-        <div id="artistImageBackground" class="w-100 h-100"></div>
+      <div id="infosContainer" class="color">
         <div id="infosContent" class="h-100 w-100 flex flex-column flex-between">
-          <h2>
-            {{ name }}
-          </h2>
-          <div class="w-100 flex flex-between flex-align-end">
-            <div id="stylesContainer" class="w-100 flex flex-row flex-start">
+          <div class="w-100 flex flex-column">
+            <h2>{{ name }}</h2>
+            <div
+              id="stylesContainer"
+              class="w-100 flex flex-row flex-start flex-align-end flex-wrap"
+            >
               <span v-for="style in props.styles" :key="style" class="styleContainer">{{
                 style
               }}</span>
             </div>
-            <div id="bookButton" class="flex flex-center flex-align-center"><h4>Book</h4></div>
+          </div>
+          <div class="flex flex-between flex-align-end">
+            <div id="iconsConatiner" class="flex flex-align-end">
+              <a
+                v-if="network?.insta"
+                class="btn"
+                :href="network?.insta"
+                target="_blank"
+                :style="{ marginBottom: `-0.25rem` }"
+              >
+                <i class="fa fa-instagram" aria-hidden="true"></i>
+              </a>
+              <a
+                v-if="network?.soundCloud"
+                class="btn"
+                :href="network?.soundCloud"
+                target="_blank"
+                :style="{ marginBottom: `-0.5rem` }"
+              >
+                <i class="fa fa-soundcloud" aria-hidden="true"></i>
+              </a>
+            </div>
+            <div id="bookButton" class="inverse-color flex flex-center flex-align-center">
+              <h4>Book</h4>
+            </div>
           </div>
         </div>
       </div>
-      <div id="detailsContainer" class="w-100 flex flex-column flex-around">
-        <div id="trackContainer" class="w-100">
-          <div id="trackContent" class="w-100 flex flex-column">
-            <SoundCloudSong
-              v-for="id in props.trackIds"
-              :key="id"
-              :id="id"
-              classes="trackItem"
-            ></SoundCloudSong>
+      <div id="detailsContainer" class="w-100">
+        <div id="artistImageBackground" class="h-100 w-100"></div>
+        <div id="detailsContent" class="h-100 w-100 flex flex-column">
+          <div id="trackContainer" class="w-100">
+            <h3>Mix</h3>
+            <div id="trackContent" class="w-100 flex flex-column">
+              <SoundCloudSong
+                v-for="id in props.trackIds"
+                :key="id"
+                :id="id"
+                classes="trackItem"
+              ></SoundCloudSong>
+            </div>
           </div>
-        </div>
-        <div id="descriptionContainer" class="w-100">
-          <div id="descriptionContent" class="flex flex-column flex-center">
-            <p v-for="line in props.description" :key="line">{{ line }}</p>
+          <div id="descriptionContainer" class="w-100">
+            <h3>Description</h3>
+            <div id="descriptionContent" class="flex flex-column flex-center">
+              <p v-for="line in props.description" :key="line">{{ line }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -82,6 +112,8 @@ onMounted(() => {
 </template>
 
 <style lang="scss">
+@import '../assets/main.scss';
+
 #artistContainer {
   cursor: pointer;
   transition: grayscale, ease-in-out, 0.3s;
@@ -104,7 +136,7 @@ onMounted(() => {
       visibility: visible;
 
       h4 {
-        color: black !important;
+        color: $color-inverse !important;
       }
     }
   }
@@ -120,13 +152,13 @@ onMounted(() => {
 
     position: absolute;
     margin: auto;
-    top: 50%;
+    top: 70%;
     left: 50%;
     transform: translate(-50%, -50%);
 
-    background-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 0.8);
     &:hover {
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, 1);
     }
 
     h4 {
@@ -137,93 +169,140 @@ onMounted(() => {
   }
 }
 
-.infosContainer {
+#infosContainer {
   padding: 0.5rem;
-  background-color: rgba(255, 255, 255, 0);
 
   .styleContainer {
-    background-color: rgba(0, 0, 0, 1);
-    margin-right: 0.5rem;
+    transition: background-color ease-in-out 0.1s;
+
+    background-color: rgba(24, 24, 24, 0.7);
+    margin: 0.25rem;
     padding: 0.5rem;
-    border-radius: 50px;
+    border-radius: 5px;
+
+    font-weight: bold;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(24, 24, 24, 1);
     }
   }
 }
 
 #dialogContainer {
-  #artistImageBackground {
-    z-index: -1;
-    position: absolute;
-    background-image: v-bind(backgroundImage);
-    filter: blur(0px);
-    background-size: 110%;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+  justify-items: center;
+  position: relative;
+  padding: 0rem;
 
-  .infosContainer {
-    height: fit-content;
-    min-height: 13rem;
-    justify-items: center;
-    position: relative;
-    padding: 0rem;
+  #infosContainer {
+    border-bottom: 0.125rem $color solid;
 
     #infosContent {
       padding: 2rem;
-    }
-  }
 
-  #bookButton {
-    cursor: pointer;
-    visibility: visible;
-    width: 150px;
-    height: fit-content;
-    padding: 0.75rem;
+      h2 {
+        margin: 0px;
+      }
 
-    background-color: rgba(255, 255, 255, 1);
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.8);
-    }
+      .styleContainer {
+        transition: background-color ease-in-out 0.1s;
+        background-color: rgba(255, 255, 255, 0.7);
+        color: black !important;
 
-    h4 {
-      margin: 0px;
-      color: black !important;
+        span {
+          color: black !important;
+        }
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 1);
+        }
+      }
+
+      #iconsConatiner {
+        a {
+          padding: 0rem 1rem 0rem 0rem;
+          i {
+            color: rgba(255, 255, 255, 1);
+            font-size: 2rem;
+
+            &:hover {
+              color: rgba(255, 255, 255, 1);
+            }
+          }
+        }
+      }
+
+      #bookButton {
+        margin-top: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        visibility: visible;
+        width: 10rem;
+        height: fit-content;
+        padding: 0.75rem;
+        background-color: rgba(255, 255, 255, 1);
+        align-self: flex-end;
+
+        transition: transform, ease-in-out, 0.1s;
+        &:hover {
+          box-shadow: 0.25rem 0.25rem 0rem 0rem white;
+          transform: translate(-0.25rem, -0.25rem);
+        }
+
+        h4 {
+          margin: 0px;
+        }
+      }
     }
   }
 
   #detailsContainer {
-    height: calc(100% - 128px - 2rem);
-    margin-top: 2rem;
-    padding: 2rem;
+    height: calc(100% - 17rem);
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.3);
 
-    #trackContainer,
-    #descriptionContainer {
-      border-radius: 5px;
-      overflow-y: auto;
-      margin-bottom: 2rem;
-      max-height: 50%;
-      height: fit-content;
-      background-color: rgba(0, 0, 0, 0.5);
+    h3,
+    p,
+    span {
+      color: $color;
     }
-    #trackContainer {
-      #trackContent {
-        padding: 1rem 2rem 1rem 2rem;
 
-        .trackItem {
-          margin-bottom: 1rem;
-          margin-top: 1rem;
+    #artistImageBackground {
+      z-index: -1;
+      position: absolute;
+      background-image: v-bind(backgroundImage);
+      background-size: 110%;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #detailsContent {
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      -ms-overflow-style: none;
+      overflow: -moz-scrollbars-none;
+
+      overscroll-behavior: contain;
+      overflow-y: auto;
+
+      #trackContainer,
+      #descriptionContainer {
+        padding: 2rem;
+      }
+      #trackContainer {
+        #trackContent {
+          .trackItem {
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+          }
         }
       }
-    }
 
-    #descriptionContainer {
-      padding: 2rem;
-
-      #descriptionContent {
-        overflow-y: auto;
+      #descriptionContainer {
+        #descriptionContent {
+          overflow-y: auto;
+        }
       }
     }
   }
@@ -231,7 +310,7 @@ onMounted(() => {
 
 dialog:-internal-dialog-in-top-layer::backdrop {
   background-image: v-bind(backgroundImage);
-  background-size: 33%;
-  filter: blur(20px) grayscale(0.2);
+  background-size: 100% 100%;
+  filter: blur(10px) grayscale(0.4) contrast(0.7);
 }
 </style>

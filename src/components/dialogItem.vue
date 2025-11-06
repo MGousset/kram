@@ -23,15 +23,15 @@ function closeDialog() {
 
 <template>
   <dialog :id="id" @click.stop.prevent="">
-    <btn type="btn" class="btn" id="closeButton" @click="closeDialog"
-      ><i i class="bi bi-x"></i
-    ></btn>
+    <btn type="btn" class="btn" id="closeButton" @click="closeDialog">
+      <i class="fa fa-times" aria-hidden="true"></i>
+    </btn>
     <slot></slot>
   </dialog>
 </template>
 
 <style lang="scss">
-@import '../../node_modules/bootstrap-icons/font/bootstrap-icons.min.css';
+@import '../assets/main.scss';
 
 dialog {
   position: fixed;
@@ -45,7 +45,7 @@ dialog {
   height: 80%;
   width: 80%;
   max-width: 800px;
-  min-width: 400px;
+  min-width: 350px;
 
   border: none;
   border-radius: 5px;
@@ -59,9 +59,8 @@ dialog {
     padding: 0.5rem;
 
     i::before {
-      font-size: 2rem;
-      color: white;
-      background-color: black;
+      font-size: 1.5rem;
+      color: $color;
     }
 
     transition: rotate, ease-in-out, 0.3s;
@@ -69,18 +68,65 @@ dialog {
       transform: rotate(-180deg);
     }
   }
+
+  &:-internal-dialog-in-top-layer::backdrop {
+    z-index: 110;
+    width: 110vw;
+    height: 110vh;
+    transform: translate(-5vw, -5vh);
+    pointer-events: none;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 1);
+    inset: 0px;
+  }
 }
 
 dialog[open] {
-  animation: showed 0.1s ease-in forwards;
+  animation: heightOpen 0.1s ease-in forwards;
+  animation: upingToMid 0.1s ease-in forwards;
+
+  &:-internal-dialog-in-top-layer::backdrop {
+    animation: openWindow 0.1s ease-in forwards;
+  }
 }
 
-@keyframes showed {
+@keyframes heightOpen {
+  0% {
+    height: 0%;
+  }
+  100% {
+    height: 80%;
+  }
+}
+
+@keyframes upingToMid {
   0% {
     top: 100%;
   }
   100% {
     top: 50%;
+  }
+}
+
+@keyframes upingling {
+  0% {
+    top: 100%;
+  }
+  100% {
+    top: 0%;
+  }
+}
+
+@keyframes openWindow {
+  0% {
+    width: 0vw;
+    height: 0vh;
+    transform: translate(50vw, 50vh);
+  }
+  100% {
+    width: 110vw;
+    height: 110vh;
+    transform: translate(-5vw, -5vh);
   }
 }
 </style>
