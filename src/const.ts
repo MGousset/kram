@@ -26,6 +26,7 @@ export const artistes: artistesProps[] = [
     name: 'ANTMO',
     description: antmoDesc,
     imgUrl: 'src/img/antmo.jpg',
+    cutPercent: '78',
     styles: ['Hargroove', 'Techno'],
     network: {
       insta: 'https://www.instagram.com/antmo_dule_/',
@@ -49,6 +50,7 @@ export const artistes: artistesProps[] = [
       '253A2134135164',
       '253A2047582812',
     ],
+    cutPercent: '29',
   },
   {
     name: 'RONNIE',
@@ -60,5 +62,6 @@ export const artistes: artistesProps[] = [
       soundCloud: 'https://soundcloud.com/raoul-rivier',
     },
     trackIds: ['253A2197414259', '253A2197390623', '253A2177484102', '253A2191290279'],
+    cutPercent: '32',
   },
 ]

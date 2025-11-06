@@ -9,9 +9,9 @@ export type artisteSlideProps = {
   classes?: string
 }
 
-const transi = computed(() => 'slide-' + props.direction)
-
 const props = defineProps<artisteSlideProps>()
+
+const transi = computed(() => 'slide-' + props.direction)
 
 const visible = computed(() => props.index === props.selected) // actual selected artist slide (index)
 

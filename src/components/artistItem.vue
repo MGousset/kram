@@ -8,6 +8,7 @@ export type artistesProps = {
   name: string
   description: string[]
   imgUrl: string
+  cutPercent?: string
   styles: string[]
   trackIds: string[]
   network?: { insta?: string; soundCloud?: string }

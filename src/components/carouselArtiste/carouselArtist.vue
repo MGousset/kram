@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import type { artistesProps } from '../artistItem.vue'
 import ArtisteListButton from './artisteListButton.vue'
 import artistSlide from './artistSlide.vue'
+import carouselBgImg from './carouselBgImg.vue'
 
 export type carouselProps = {
   artistes: artistesProps[] // list of all artists
@@ -39,6 +40,16 @@ function select(index: number){
 
 <template>
   <div id="OverPhotoCarousel">
+    <carouselBgImg
+      v-for="(artiste, index) in artistes"
+        :key="index"
+        :imgUrl="artiste.imgUrl"
+        :cutPercent="artiste.cutPercent"
+        :index="index"
+        :selected="selected"
+        :direction="direction"
+        class="bgImg"
+    />
     <div id="listArtist">
       <ArtisteListButton
         id="topButton"
@@ -78,25 +89,33 @@ function select(index: number){
 
 <style lang="scss">
 #OverPhotoCarousel {
-  background-color: aqua;
-  opacity: 0.5;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-right: 0px;
-  padding-left: 0px;
+  //background-color: aqua;
+  //opacity: 0.5;
+  padding: 0px;
   width: 100%;
   height: 100%;
-  z-index: 10;
+  z-index: 1;
+  position: relative;
+
+  .bgImg{
+    position: absolute;
+    //opacity: 0.5;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
 
   #listArtist{
+    position: relative;
     display: flex;
     justify-content: center;
+    z-index: 2;
 
     #topButton{
       background-color: rgb(80, 80, 95);
       opacity: 0.7;
       margin: 20px;
-      margin-top: 0;
       width : 100px;
       height: 40px;
       border : 0px;
@@ -106,12 +125,14 @@ function select(index: number){
   #ActualCarousel {
     //background-color: pink;
     //opacity: 0.5;
+    position: relative;
     margin : 0;
     width : 100%;
     height: 100%;
     display: flex;
     justify-content: left;
     flex-direction: row;
+    z-index: 2;
 
     #artistsContainer{
       background-color: rgb(80, 80, 95);
