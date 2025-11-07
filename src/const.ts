@@ -1,6 +1,10 @@
 import type { artistesProps } from './components/artistItem.vue'
 import * as THREE from 'three'
 
+import antmoUrl from './assets/img/antmo.jpg'
+import miraUrl from './assets/img/mira.jpeg'
+import ronnieUrl from './assets/img/ronnie.jpg'
+
 const antmoDesc = [
   'Depuis une décennie, Antmo, artiste polyvalent et cofondateur du collectif KRAM, explore les multiples facettes de la musique électronique.',
   'Sa passion ardente pour la musique le conduit à travers un panorama sonore vaste, allant de la techno hypnotique aux vibrations envoûtantes de la trance, en passant par les rythmes énergiques aux influences britanniques.',
@@ -26,7 +30,7 @@ export const artistes: artistesProps[] = [
   {
     name: 'ANTMO',
     description: antmoDesc,
-    imgUrl: 'src/img/antmo.jpg',
+    imgUrl: antmoUrl,
     cutPercent: '78',
     styles: ['Hargroove', 'Techno'],
     network: {
@@ -38,7 +42,7 @@ export const artistes: artistesProps[] = [
   {
     name: 'MIRA',
     description: miraDesc,
-    imgUrl: 'src/img/mira.jpeg',
+    imgUrl: miraUrl,
     styles: ['Breakbeat', 'Bailey', 'Latine Core'],
     network: {
       insta: 'https://www.instagram.com/mira3o3/',
@@ -56,7 +60,7 @@ export const artistes: artistesProps[] = [
   {
     name: 'RONNIE',
     description: ronnieDesc,
-    imgUrl: 'src/img/ronnie.JPG',
+    imgUrl: ronnieUrl,
     styles: ['House', 'Hard House', 'Trance'],
     network: {
       insta: 'https://www.instagram.com/ronni_lusion/',
@@ -69,21 +73,21 @@ export const artistes: artistesProps[] = [
 
 export const colorByImageUrl: Map<string, { color1: THREE.Color; color2: THREE.Color }> = new Map([
   [
-    'src/img/antmo.jpg',
+    antmoUrl,
     {
       color1: new THREE.Color(156 + 50, 221 + 50, 214 + 50),
       color2: new THREE.Color(0 + 50, 142 + 50, 145 + 50),
     },
   ],
   [
-    'src/img/mira.jpeg',
+    miraUrl,
     {
       color1: new THREE.Color(111 + 50, 118 + 50, 42 + 50),
       color2: new THREE.Color(44 + 50, 71 + 50, 0 + 50),
     },
   ],
   [
-    'src/img/ronnie.JPG',
+    ronnieUrl,
     {
       color1: new THREE.Color(180 + 50, 124 + 50, 146 + 50),
       color2: new THREE.Color(166 + 50, 111 + 50, 140 + 50),

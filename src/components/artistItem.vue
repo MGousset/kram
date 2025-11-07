@@ -171,7 +171,11 @@ onMounted(() => {
                 classes="trackItem"
               ></SoundCloudSong>
             </div>
-            <div id="loading" v-show="!isTrackLoaded"></div>
+            <div
+              id="loading"
+              class="w-100 flex flex-center flex-align-center"
+              v-show="!isTrackLoaded"
+            ></div>
           </div>
           <div id="descriptionContainer" class="w-100">
             <h3>Description</h3>
@@ -269,6 +273,7 @@ onMounted(() => {
   padding: 0rem;
 
   #infosContainer {
+    z-index: 1;
     border-bottom: 0.125rem $color solid;
 
     #infosContent {
@@ -375,7 +380,8 @@ onMounted(() => {
       }
 
       #loading {
-        background-image: 'src/img/loading.gif';
+        background-image: url('./assets/img/loading.gif');
+        height: 7rem;
       }
 
       #descriptionContainer {
