@@ -220,6 +220,8 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
 @import './assets/main.scss';
 
 #navBar {
+  transition: visibility ease-in-out 0.3s;
+
   z-index: 100;
   width: 25rem;
   left: 50%;

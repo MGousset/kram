@@ -7,7 +7,15 @@
   width: 100%;
 
   a {
+    border: none !important;
     text-decoration: none;
+
+    &:hover,
+    &:active,
+    &:focus {
+      border: none !important;
+      text-decoration: none;
+    }
 
     i {
       transition: font-size ease-in-out 0.07s;
@@ -21,6 +29,8 @@
 
   .color {
     background-color: $bg-color !important;
+
+    &a,
     a {
       color: $color !important;
 
@@ -44,6 +54,7 @@
   .inverse-color {
     background-color: $bg-color-inverse;
 
+    &a,
     a {
       color: $color-inverse !important;
 

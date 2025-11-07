@@ -43,6 +43,12 @@ function focus(): void {
   }
 }
 
+function openPage(url?: string): void {
+  if (url) {
+    window.open(url, '_blank')?.focus()
+  }
+}
+
 const isTrackLoadedById = new Map<string, boolean>()
 for (const trackId of props.trackIds) {
   isTrackLoadedById.set(trackId, false)
@@ -124,25 +130,31 @@ onMounted(() => {
               <a
                 v-if="network?.insta"
                 class="btn"
-                :href="network?.insta"
-                target="_blank"
                 :style="{ marginBottom: `-0.25rem` }"
+                @click="() => openPage(network?.insta)"
               >
                 <i class="fa fa-instagram" aria-hidden="true"></i>
               </a>
               <a
                 v-if="network?.soundCloud"
                 class="btn"
-                :href="network?.soundCloud"
                 target="_blank"
                 :style="{ marginBottom: `-0.5rem` }"
+                @click="() => openPage(network?.soundCloud)"
               >
                 <i class="fa fa-soundcloud" aria-hidden="true"></i>
               </a>
             </div>
-            <div id="bookButton" class="inverse-color flex flex-center flex-align-center">
+            <a
+              id="bookButton"
+              class="inverse-color flex flex-around flex-align-center"
+              target="_blank"
+              href="mailto:booking@kram-agency.com"
+              @click="() => openPage(`mailto:booking@kram-agency.com`)"
+            >
+              <i class="fa fa-envelope" aria-hidden="true"></i>
               <h4>Book</h4>
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -217,6 +229,7 @@ onMounted(() => {
     top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border-radius: 5px;
 
     background-color: rgba(255, 255, 255, 0.8);
     &:hover {
@@ -269,10 +282,7 @@ onMounted(() => {
         transition: background-color ease-in-out 0.1s;
         background-color: rgba(255, 255, 255, 0.7);
         color: black !important;
-
-        span {
-          color: black !important;
-        }
+        margin-left: 0rem !important;
 
         &:hover {
           background-color: rgba(255, 255, 255, 1);
@@ -280,8 +290,10 @@ onMounted(() => {
       }
 
       #iconsConatiner {
+        margin-left: 0.125rem;
         a {
-          padding: 0rem 1rem 0rem 0rem;
+          padding: 0px;
+          margin-right: 1rem;
           i {
             color: rgba(255, 255, 255, 1);
             font-size: 2rem;
@@ -302,6 +314,7 @@ onMounted(() => {
         height: fit-content;
         padding: 0.75rem;
         background-color: rgba(255, 255, 255, 1);
+        color: $color-inverse !important;
         align-self: flex-end;
 
         transition: transform, ease-in-out, 0.1s;
