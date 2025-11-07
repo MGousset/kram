@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import * as THREE from 'three'
-import { defineAsyncComponent, onMounted, ref, type Ref } from 'vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import { ANIMATION } from '@/tools/tools'
 import { artistes, colorByImageUrl } from './const'
-
-import layoutUrl from './assets/noise.svg'
 
 import AnimatedText from './components/animatedText.vue'
 import LeftRightAnimated from './components/leftRightAnimated.vue'
 import AnimatedBg from './components/animatedBg/animatedBg.vue'
+import { useWindowSize } from '@vueuse/core'
 
 const ArtistItem = defineAsyncComponent(() =>
   import('./components/artistItem.vue').then((comp) => {
@@ -18,11 +17,7 @@ const ArtistItem = defineAsyncComponent(() =>
 )
 
 const isBgAnimated = ref(true) // TODO put false for dev
-
-const headerTopValue = ref(50)
-const navbarTopValue = ref(60)
 const linkOpacity = ref(0)
-const contentLeftosition = ref(100)
 
 const defaultbgColors = {
   color1: new THREE.Color(247, 175, 193),
@@ -42,54 +37,20 @@ async function afterLoaded(): Promise<void> {
   }
 
   await centerArtistItems()
-
   linkOpacity.value = 1
 }
 
 onMounted(() => {
   innerScrollTo(0)
-  document.addEventListener('scroll', updateScrollY)
-  document.addEventListener('wheel', updateScrollY)
-  window.addEventListener('resize', updateScrollY)
-
   window.addEventListener('resize', centerArtistItems)
 })
 
-function innerScrollTo(position: number) {
+const animationCount = ref(0)
+const isAtTop = ref(false)
+function innerScrollTo(position: number): void {
+  animationCount.value += 1
+  isAtTop.value = position === 0
   scrollTo({ top: position })
-}
-
-const minVisibleHeight = 0
-const maxHeigh = window.innerHeight
-const endAnimation = maxHeigh - minVisibleHeight
-
-function updateScrollY(): void {
-  const animationProgression = Math.min(window.scrollY / endAnimation, 1)
-
-  updateHeaderTopValue(animationProgression)
-  updateNavbarTopValue(animationProgression)
-  updateContentLeftosition(animationProgression)
-}
-
-const startHeaderTopValue = 50
-const endHeaderTopValue = -10
-function updateHeaderTopValue(animationProgression: number): void {
-  headerTopValue.value =
-    startHeaderTopValue + (endHeaderTopValue - startHeaderTopValue) * animationProgression
-}
-
-const startNavbarTopValue = 60
-const endNavbarTopValue = 0
-function updateNavbarTopValue(animationProgression: number): void {
-  navbarTopValue.value =
-    startNavbarTopValue + (endNavbarTopValue - startNavbarTopValue) * animationProgression
-}
-
-const startContentLeftValue = 100
-const endContentLeftValue = 0
-function updateContentLeftosition(animationProgression: number): void {
-  contentLeftosition.value =
-    startContentLeftValue + (endContentLeftValue - startContentLeftValue) * animationProgression
 }
 
 async function centerArtistItems(): Promise<void> {
@@ -152,7 +113,8 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
   <div
     id="navBar"
     class="fixed flex flex-row flex-between flex-align-end"
-    :style="{ top: (navbarTopValue ?? 60) + '%', opacity: linkOpacity }"
+    :class="{ up: !isAtTop }"
+    :style="{ opacity: linkOpacity }"
   >
     <LeftRightAnimated :animated="true" animation="leftRight">
       <a @click="() => innerScrollTo(0)"><h2>KRAM</h2></a>
@@ -168,7 +130,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
       class="h-100 w-100 absolute"
     ></AnimatedBg>
     <div id="layout" class="h-100 w-100 absolute no-events"></div>
-    <div id="navHeader" class="w-100 flex" :style="{ top: (headerTopValue ?? 50) + '%' }">
+    <div id="navHeader" class="w-100 flex" :class="{ up: !isAtTop }">
       <div
         id="titleContent"
         class="w-100 flex flex-center flex-align-center"
@@ -199,7 +161,6 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
             <div
               id="artistsMosaiqContainer"
               class="w-100 flex flex-row flex-align-center flex-wrap sectionContent flex-2"
-              :style="{ left: `${contentLeftosition ?? 100}%` }"
             >
               <ArtistItem
                 v-for="artiste in artistes"
@@ -242,8 +203,36 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
 <style lang="scss">
 @import './assets/main.scss';
 
+@keyframes up {
+  from {
+    top: 50%;
+  }
+
+  to {
+    top: -10%;
+  }
+}
+
+@keyframes up2 {
+  from {
+    top: 60%;
+  }
+
+  to {
+    top: 0%;
+  }
+}
+
 #navBar {
   transition: opacity ease-in-out 0.3s;
+
+  &.up {
+    animation: 0.5s ease-in-out normal both up2;
+  }
+
+  &:not(.up) {
+    animation: 0.5s ease-in-out reverse both up2;
+  }
 
   z-index: 100;
   width: 25rem;
@@ -264,6 +253,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
 }
 
 header {
+  background-color: aqua;
   height: 100vh;
   z-index: 0;
   position: sticky;
@@ -282,6 +272,14 @@ header {
   #navHeader {
     transform: translate(0, -50%);
     position: relative;
+
+    &.up {
+      animation: 0.3s ease-in-out normal both up;
+    }
+
+    &:not(.up) {
+      animation: 0.3s ease-in-out reverse both up;
+    }
 
     #titleContent {
       padding: 5rem;
