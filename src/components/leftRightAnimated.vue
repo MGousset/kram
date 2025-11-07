@@ -23,7 +23,8 @@ const state = computed(() => (props.animated ? 'running' : 'paused'))
 
 <style lang="scss">
 a {
-  transition: left ease-in-out 1s 1s;
+  transition: margin-left ease-in-out 1s 1s;
+  transition: margin-right ease-in-out 1s 1s;
   animation: v-bind(durationString) ease-in-out infinite alternate v-bind(animation);
   animation-play-state: v-bind(state);
   animation-delay: v-bind(delay);

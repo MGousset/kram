@@ -5,10 +5,9 @@ export function initScene(cam_fog: number): {
   camera: THREE.PerspectiveCamera
 } {
   const scene = new THREE.Scene()
-  scene.background = new THREE.Color(0, 0, 0)
+  scene.background = new THREE.Color(255, 0, 0)
 
   const camera = new THREE.PerspectiveCamera(cam_fog, screen.width / screen.height, 0.1, 1000)
-  camera.far = 500
   camera.position.z = 5
 
   scene.add(camera)

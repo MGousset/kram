@@ -261,11 +261,8 @@ void main() {
     vec3 c1 = rgb(u_color1.r, u_color1.g, u_color1.b);
     vec3 c2 = rgb(u_color2.r, u_color2.g, u_color2.b);
 
-    float noise1 = snoise(st + t * 0.7);
-    float noise2 = snoise(st * 2. + t * 0.4);
-
-    vec3 color2 = mix(bgMain, c1, noise1 * 4.);
-    color2 = mix(color2, c2, noise2 * 2.);
+    vec3 color2 = mix(bgMain, c1, t * 40.);
+    color2 = mix(color2, c2, t * 20.);
 
     color *= color2;
     gl_FragColor = vec4(0.05-color, 1.0);
