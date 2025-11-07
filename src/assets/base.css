@@ -107,12 +107,12 @@ body {
   }
 
   &::-webkit-scrollbar-track {
-    background: orange; /* color of the tracking area */
+    background: #181818; /* color of the tracking area */
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: blue; /* color of the scroll thumb */
-    border-radius: 20px; /* roundness of the scroll thumb */
-    border: 3px solid orange; /* creates padding around scroll thumb */
+    background-color: white; /* color of the scroll thumb */
+    border-radius: 5px; /* roundness of the scroll thumb */
+    border: 3px solid #181818; /* creates padding around scroll thumb */
   }
 }

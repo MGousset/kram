@@ -25,6 +25,12 @@ type sceneProps = {
 
 const props = defineProps<sceneProps>()
 
+/** Define emits */
+
+const emits = defineEmits<{
+  finished: []
+}>()
+
 /** Define variables  */
 const initialTextArray = props.label.split('')
 const textArray = ref([...initialTextArray])
@@ -85,6 +91,8 @@ async function animate(options?: {
       textArray.value = initialTextArray
     }
   }
+
+  emits('finished')
 }
 
 /** Animation of one letter */

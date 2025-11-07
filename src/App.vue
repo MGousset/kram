@@ -19,7 +19,8 @@ const isBgAnimated = ref(true) // TODO put false for dev
 
 const headerTopValue = ref(50)
 const navbarTopValue = ref(60)
-const linkVisibility = ref('hidden') as Ref<'hidden' | 'visible'>
+const linkOpacity = ref(0)
+const contentLeftosition = ref(100)
 
 const defaultbgColors = {
   color1: new THREE.Color(247, 175, 193),
@@ -27,10 +28,20 @@ const defaultbgColors = {
 }
 const bgColors = ref(defaultbgColors)
 
+let isTitleAnimationEnded = false
+function setTitleAnimation(): void {
+  isTitleAnimationEnded = true
+}
+
 async function afterLoaded(): Promise<void> {
+  if (!isTitleAnimationEnded) {
+    await new Promise((f) => setTimeout(f, 200))
+    return afterLoaded()
+  }
+
   await centerArtistItems()
 
-  linkVisibility.value = 'visible'
+  linkOpacity.value = 1
 }
 
 onMounted(() => {
@@ -55,6 +66,7 @@ function updateScrollY(): void {
 
   updateHeaderTopValue(animationProgression)
   updateNavbarTopValue(animationProgression)
+  updateContentLeftosition(animationProgression)
 }
 
 const startHeaderTopValue = 50
@@ -71,10 +83,17 @@ function updateNavbarTopValue(animationProgression: number): void {
     startNavbarTopValue + (endNavbarTopValue - startNavbarTopValue) * animationProgression
 }
 
+const startContentLeftValue = 100
+const endContentLeftValue = 0
+function updateContentLeftosition(animationProgression: number): void {
+  contentLeftosition.value =
+    startContentLeftValue + (endContentLeftValue - startContentLeftValue) * animationProgression
+}
+
 async function centerArtistItems(): Promise<void> {
   const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
   if (!artistsMosaiqContainer) {
-    await new Promise((f) => setTimeout(f, 1000))
+    await new Promise((f) => setTimeout(f, 200))
     return centerArtistItems()
   }
 
@@ -82,7 +101,7 @@ async function centerArtistItems(): Promise<void> {
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
-    await new Promise((f) => setTimeout(f, 1000))
+    await new Promise((f) => setTimeout(f, 200))
     return centerArtistItems()
   }
 
@@ -131,12 +150,12 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
   <div
     id="navBar"
     class="fixed flex flex-row flex-between flex-align-end"
-    :style="{ top: (navbarTopValue ?? 60) + '%', visibility: linkVisibility }"
+    :style="{ top: (navbarTopValue ?? 60) + '%', opacity: linkOpacity }"
   >
-    <LeftRightAnimated :animated="linkVisibility === 'visible'" animation="leftRight">
+    <LeftRightAnimated :animated="true" animation="leftRight">
       <a @click="() => innerScrollTo(0)"><h2>KRAM</h2></a>
     </LeftRightAnimated>
-    <LeftRightAnimated :animated="linkVisibility === 'visible'" animation="rightLeft">
+    <LeftRightAnimated :animated="true" animation="rightLeft">
       <a @click="() => innerScrollTo(1080)"><h2>ARTISTES</h2></a>
     </LeftRightAnimated>
   </div>
@@ -161,6 +180,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
           textClasses="title"
           :onMontedAnimation="ANIMATION.randomstep"
           :onHoverLetterAnimation="ANIMATION.grow"
+          @finished="() => setTitleAnimation()"
         ></AnimatedText>
       </div>
     </div>
@@ -177,6 +197,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
             <div
               id="artistsMosaiqContainer"
               class="w-100 flex flex-row flex-align-center flex-wrap sectionContent flex-2"
+              :style="{ left: `${contentLeftosition ?? 100}%` }"
             >
               <ArtistItem
                 v-for="artiste in artistes"
@@ -220,7 +241,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
 @import './assets/main.scss';
 
 #navBar {
-  transition: visibility ease-in-out 0.3s;
+  transition: opacity ease-in-out 0.3s;
 
   z-index: 100;
   width: 25rem;
@@ -277,6 +298,8 @@ header {
 main {
   z-index: 1;
   #container {
+    overflow-x: hidden;
+
     #content {
       section {
         .sectionContainer {
@@ -296,6 +319,7 @@ main {
           }
 
           .sectionContent {
+            position: relative;
             border-radius: 5px;
             overflow-y: auto;
 
@@ -317,23 +341,12 @@ main {
       }
 
       #rosterSection {
-        .sectionContainer {
-          .artistesBgImgs {
-            position: absolute;
-            height: 100%;
-
-            filter: grayscale(1);
-          }
-        }
-
         .artistItem {
           z-index: 1;
           aspect-ratio: 1;
           height: fit-content;
           margin-top: 10px;
           margin-bottom: 10px;
-
-          // transform: rotate3d(1, 1, 0, 15deg);
         }
       }
 
