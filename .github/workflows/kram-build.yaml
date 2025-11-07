@@ -35,11 +35,12 @@ jobs:
       - name: Build Node assets
         env:
           CI: true
-          SITE_URL: ${{ inputs.site-url }}
+          SITE_URL: ${{ inputs['site-url'] }}
         run: |
           npm install --global pnpm@10.18.3
-          pnpm install
-          pnpm build
+          pnpm install --frozen-lockfile
+          npx vue-tsc --noEmit
+          pnpm vite build
 
 # Please do not touch the following action
       - name: Store deployment content
@@ -47,7 +48,7 @@ jobs:
         with:
           api-key: ${{ secrets.IONOS_API_KEY }}
           service-host: api-eu.ionos.space
-          project-id: ada5961d-150d-4edf-ad45-ed655ff18105
+          project-id: 92b54c90-8bd5-4471-abc9-938d1793791b
           branch-id: ${{ inputs.branch-id }}
           version: ${{ github.sha }}
           folder: ${{ env.DEPLOYMENT_FOLDER }}

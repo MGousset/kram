@@ -269,6 +269,7 @@ onMounted(() => {
   padding: 0rem;
 
   #infosContainer {
+    z-index: 1;
     border-bottom: 0.125rem $color solid;
 
     #infosContent {
