@@ -7,5 +7,5 @@
       stitchTiles='stitch'/>
   </filter>
 
-  <rect width='200px' height='200px' filter='url(#noiseFilter)' opacity="0.3" />
+  <rect width='200px' height='200px' filter='url(#noiseFilter)' opacity="0.1" />
 </svg>

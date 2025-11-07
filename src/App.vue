@@ -4,6 +4,8 @@ import { defineAsyncComponent, onMounted, ref, type Ref } from 'vue'
 import { ANIMATION } from '@/tools/tools'
 import { artistes, colorByImageUrl } from './const'
 
+import layoutUrl from './assets/noise.svg'
+
 import AnimatedText from './components/animatedText.vue'
 import LeftRightAnimated from './components/leftRightAnimated.vue'
 import AnimatedBg from './components/animatedBg/animatedBg.vue'
@@ -273,8 +275,8 @@ header {
 
   #layout {
     z-index: -9;
-    background-color: rgba(0, 0, 0, 0.4);
-    background-image: url('../assets/noise.svg');
+    background-color: rgba(0, 0, 0, 0.3);
+    background-image: url('./assets/noise.svg');
   }
 
   #navHeader {
@@ -305,7 +307,7 @@ main {
         .sectionContainer {
           position: relative;
           height: 100vh;
-          background-color: rgb(0, 0, 0, 0.3);
+          background-color: rgb(0, 0, 0, 0.1);
           padding-bottom: 3rem;
 
           .sectionHeader {
