@@ -5,7 +5,7 @@ import sceneItem from './components/sceneItem.vue'
 
 const { animated, bgColors } = defineProps<{
   animated: boolean
-  bgColors?: { color1: THREE.Color; color2: THREE.Color }
+  bgColors: { color1: THREE.Color; color2: THREE.Color }
 }>()
 </script>
 
@@ -17,6 +17,7 @@ const { animated, bgColors } = defineProps<{
 
 <style lang="scss">
 #backgroundContainer {
+  background-color: chocolate;
   z-index: -11;
   overflow: hidden;
 }
