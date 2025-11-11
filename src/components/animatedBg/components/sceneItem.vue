@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, render, watch } from 'vue'
 import { getDefaultUniforms, initScene } from './tools'
 import { noiseVertex, noiseFragment } from './shaders'
 
 import * as THREE from 'three'
-import { generateRandomColor } from '@/tools/tools'
+import { useScreenOrientation, useWindowSize } from '@vueuse/core'
+import { step } from 'three/tsl'
 
-const MESH_SIZE = 2
-const CAM_FOG = 10
+const MESH_SIZE = 5
 
 /** Define props */
 type sceneProps = {
@@ -23,40 +23,35 @@ const {
 } = defineProps<sceneProps>()
 
 /** Define const */
+const { width, height } = useWindowSize()
+const { orientation } = useScreenOrientation()
+
 let renderer = new THREE.WebGLRenderer()
 const renderCanvas = ref<HTMLCanvasElement | null>(null)
 
-const { scene, camera } = initScene(CAM_FOG)
-
-/** Render when component is in DOM */
-onMounted(() => {
-  renderer = new THREE.WebGLRenderer({
-    canvas: renderCanvas.value ?? undefined,
-    antialias: true,
-  })
-
-  renderer.setSize(screen.width, screen.height)
-  renderer.setPixelRatio(window.devicePixelRatio)
-
-  if (animated) {
-    animate()
-  } else {
-    renderer.render(scene, camera)
-  }
-})
-
-const uniforms = {
-  ...getDefaultUniforms(),
-  u_pointsize: { value: 2.0 },
-
-  // Colors
-  u_color1: { value: bgColors.color1 },
-  u_color2: { value: bgColors.color2 },
-}
+const aspectRatio = computed(() => width.value / height.value)
+const { scene, camera } = initScene(aspectRatio.value)
 
 /** Create Mesh */
 const vertexShader = noiseVertex
 const fragmentShader = noiseFragment
+
+const uniforms = {
+  ...getDefaultUniforms(),
+
+  // Colors
+  u_color1: { value: bgColors.color1 },
+  u_color2: { value: bgColors.color2 },
+
+  u_frag: { value: new THREE.Vector4(0, 0, 0, 0) },
+
+  u_resolution: {
+    value: {
+      x: 1080,
+      y: 1080 * aspectRatio.value,
+    },
+  },
+}
 
 const plan = new THREE.PlaneGeometry(MESH_SIZE, MESH_SIZE, 1, 1)
 const materiel = new THREE.ShaderMaterial({
@@ -65,51 +60,58 @@ const materiel = new THREE.ShaderMaterial({
   uniforms: uniforms,
   wireframe: false,
 })
-
 const mesh = new THREE.Mesh(plan, materiel)
-scene.add(mesh)
+
+watch(aspectRatio, () => onResise())
+watch(orientation, () => onResise())
+
+function onResise(): void {
+  camera.left = -1 * aspectRatio.value
+  camera.bottom = 1 * aspectRatio.value
+
+  renderer.setSize(width.value, height.value)
+  renderer.setPixelRatio(aspectRatio.value)
+
+  uniforms.u_resolution.value = {
+    x: 1080,
+    y: 1080 * aspectRatio.value,
+  }
+
+  renderer.render(scene, camera)
+}
+
+/** Render when component is in DOM */
+onMounted(() => {
+  renderer = new THREE.WebGLRenderer({
+    canvas: renderCanvas.value ?? undefined,
+  })
+
+  renderer.setSize(width.value, height.value)
+  renderer.setPixelRatio(aspectRatio.value)
+
+  scene.add(mesh)
+  renderer.render(scene, camera)
+
+  if (animated) {
+    animate()
+  }
+})
 
 // The engine that powers your scene into movement
-const clock = new THREE.Clock()
-let time = 0
+const stepDuration = 1
 const animate = async (): Promise<void> => {
   requestAnimationFrame(animate)
-  if (!animated) {
-    if (clock.running) {
-      clock.stop()
-    }
-    return
-  }
-  if (!clock.running) {
-    clock.startTime = clock.oldTime
-    clock.start()
-  }
-
-  const delta = clock.getDelta()
-  time += delta
-  if (time >= 600) {
-    time = 0
-    clock.stop()
-    clock.start()
-  }
 
   uniforms.u_color1 = { value: bgColors.color1 }
   uniforms.u_color2 = { value: bgColors.color2 }
 
-  uniforms.u_time.value = Math.sin(time / 600)
+  uniforms.u_time.value += stepDuration / 10000
   renderer.render(scene, camera)
-}
 
-function randomColor(): void {
-  uniforms.u_color1.value = generateRandomColor()
-  uniforms.u_color2.value = generateRandomColor()
-
-  if (!animated) {
-    renderer.render(scene, camera)
-  }
+  await new Promise((f) => setTimeout(f, stepDuration * 100))
 }
 </script>
 
 <template>
-  <canvas ref="renderCanvas" @click.left="randomColor"></canvas>
+  <canvas ref="renderCanvas"></canvas>
 </template>

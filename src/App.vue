@@ -7,7 +7,6 @@ import { artistes, colorByImageUrl } from './const'
 import AnimatedText from './components/animatedText.vue'
 import LeftRightAnimated from './components/leftRightAnimated.vue'
 import AnimatedBg from './components/animatedBg/animatedBg.vue'
-import { useWindowSize } from '@vueuse/core'
 
 const ArtistItem = defineAsyncComponent(() =>
   import('./components/artistItem.vue').then((comp) => {
