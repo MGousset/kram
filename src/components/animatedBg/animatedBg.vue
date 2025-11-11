@@ -7,11 +7,33 @@ const { animated, bgColors } = defineProps<{
   animated: boolean
   bgColors: { color1: THREE.Color; color2: THREE.Color }
 }>()
+
+function detectMobile(): boolean {
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i,
+  ]
+
+  return (
+    toMatch.some((toMatchItem) => {
+      return navigator.userAgent.match(toMatchItem)
+    }) ||
+    (screen.width <= 800 && screen.height <= 600)
+  )
+}
+
+const isMobile = detectMobile()
 </script>
 
 <template>
   <div id="backgroundContainer">
-    <sceneItem id="scene" :bgColors="bgColors" :animated></sceneItem>
+    <div v-if="isMobile" id="scenePic" class="w-100 h-100"></div>
+    <sceneItem v-else id="scene" :bgColors="bgColors" :animated></sceneItem>
   </div>
 </template>
 
@@ -20,5 +42,10 @@ const { animated, bgColors } = defineProps<{
   background-color: chocolate;
   z-index: -11;
   overflow: hidden;
+
+  #scenePic {
+    background-image: url('./assets/img/fixedBg.png');
+    background-color: bisque;
+  }
 }
 </style>
