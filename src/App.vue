@@ -7,7 +7,6 @@ import { artistes, colorByImageUrl } from './const'
 import AnimatedText from './components/animatedText.vue'
 import LeftRightAnimated from './components/leftRightAnimated.vue'
 import AnimatedBg from './components/animatedBg/animatedBg.vue'
-import { useWindowSize } from '@vueuse/core'
 
 const ArtistItem = defineAsyncComponent(() =>
   import('./components/artistItem.vue').then((comp) => {
@@ -213,31 +212,18 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
   }
 }
 
-@keyframes up2 {
-  from {
-    top: 60%;
-  }
-
-  to {
-    top: 0%;
-  }
-}
-
 #navBar {
-  transition: opacity ease-in-out 0.3s;
+  transition: all ease-in-out 0.3s;
 
   &.up {
-    animation: 0.5s ease-in-out normal both up2;
-  }
-
-  &:not(.up) {
-    animation: 0.5s ease-in-out reverse both up2;
+    top: 5%;
   }
 
   z-index: 100;
   width: 25rem;
   left: 50%;
-  transform: translateX(-50%);
+  top: 65%;
+  transform: translate(-50%, -50%);
   padding: 1rem 2rem 1rem 2rem;
 
   a {
@@ -270,15 +256,15 @@ header {
   }
 
   #navHeader {
-    transform: translate(0, -50%);
+    transition: all ease-in-out 0.3s;
+
+    transform: translate(-50%, -50%);
     position: relative;
+    top: 50%;
+    left: 50%;
 
     &.up {
-      animation: 0.3s ease-in-out normal both up;
-    }
-
-    &:not(.up) {
-      animation: 0.3s ease-in-out reverse both up;
+      top: -10%;
     }
 
     #titleContent {
