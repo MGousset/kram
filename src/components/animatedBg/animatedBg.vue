@@ -23,7 +23,7 @@ function detectMobile(): boolean {
     toMatch.some((toMatchItem) => {
       return navigator.userAgent.match(toMatchItem)
     }) ||
-    (screen.width <= 800 && screen.height <= 600)
+    (window.innerWidth <= 800 && window.innerHeight <= 600)
   )
 }
 
