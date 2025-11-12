@@ -62,6 +62,14 @@ for (const trackId of props.trackIds) {
 
 function setTrackAsLoaded(id: string) {
   isTrackLoadedById.set(id, true)
+
+  for (const trackId of props.trackIds) {
+    if (!isTrackLoadedById.get(trackId)) {
+      return
+    }
+  }
+
+  isTrackLoaded.value = true
 }
 
 async function afterLoaded(): Promise<void> {
@@ -69,7 +77,7 @@ async function afterLoaded(): Promise<void> {
     const track = document.getElementById(trackId)
 
     if (!track) {
-      await new Promise((f) => setTimeout(f, 200))
+      await new Promise((f) => setTimeout(f, 100))
       return afterLoaded()
     }
 
@@ -77,19 +85,6 @@ async function afterLoaded(): Promise<void> {
       setTrackAsLoaded(trackId)
     }
   }
-
-  checkIfAllLoaded()
-}
-
-async function checkIfAllLoaded(): Promise<void> {
-  for (const trackId of props.trackIds) {
-    if (!isTrackLoadedById.get(trackId)) {
-      await new Promise((f) => setTimeout(f, 200))
-      return checkIfAllLoaded()
-    }
-  }
-
-  isTrackLoaded.value = true
 }
 
 function onResize(): void {
@@ -306,9 +301,24 @@ onMounted(() => {
 
 .dialogContainer {
   #dialogContent {
+    background-color: #181818;
     justify-items: center;
     position: relative;
     padding: 0rem;
+
+    &::-webkit-scrollbar {
+      width: 0.5rem; /* width of the entire scrollbar */
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent; /* color of the tracking area */
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: white; /* color of the scroll thumb */
+      border-radius: 5px; /* roundness of the scroll thumb */
+      border: transparent; /* creates padding around scroll thumb */
+    }
 
     #infosContainer {
       z-index: 1;
@@ -384,7 +394,6 @@ onMounted(() => {
       }
 
       #artistImageBackground {
-        z-index: -1;
         position: absolute;
         background-image: v-bind(backgroundImage);
         background-size: 110%;
@@ -393,14 +402,22 @@ onMounted(() => {
       }
 
       #detailsContent {
+        position: relative;
+        z-index: 1;
+
         &::-webkit-scrollbar {
-          display: none;
+          width: 0.5rem; /* width of the entire scrollbar */
         }
 
-        -ms-overflow-style: none;
-        overflow: -moz-scrollbars-none;
+        &::-webkit-scrollbar-track {
+          background: transparent; /* color of the tracking area */
+        }
 
-        overscroll-behavior: contain;
+        &::-webkit-scrollbar-thumb {
+          background-color: white; /* color of the scroll thumb */
+          border-radius: 5px; /* roundness of the scroll thumb */
+          border: transparent; /* creates padding around scroll thumb */
+        }
 
         #trackContainer,
         #descriptionContainer {
@@ -416,8 +433,13 @@ onMounted(() => {
         }
 
         #loading {
-          background-image: url('./assets/loading.gif');
-          height: 7rem;
+          background-image: url('@/assets/img/loading.gif');
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 15%;
+          height: 9rem;
+          max-height: 9rem;
+          aspect-ratio: 1;
         }
       }
     }

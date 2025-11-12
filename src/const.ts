@@ -32,7 +32,7 @@ export const artistes: artistesProps[] = [
     description: antmoDesc,
     imgUrl: antmoUrl,
     cutPercent: '78',
-    styles: ['Hargroove', 'Techno'],
+    styles: ['Hardgroove', 'Techno'],
     network: {
       insta: 'https://www.instagram.com/antmo_dule_/',
       soundCloud: 'https://soundcloud.com/krambzh/sets/antmo',
@@ -43,7 +43,7 @@ export const artistes: artistesProps[] = [
     name: 'MIRA',
     description: miraDesc,
     imgUrl: miraUrl,
-    styles: ['Breakbeat', 'Bailey', 'Latine Core'],
+    styles: ['Breakbeat', 'Bass', 'Techno'],
     network: {
       insta: 'https://www.instagram.com/mira3o3/',
       soundCloud: 'https://soundcloud.com/mira303',
