@@ -300,17 +300,17 @@ main {
             overflow-y: auto;
 
             &::-webkit-scrollbar {
-              width: 12px; /* width of the entire scrollbar */
+              width: 0.5rem; /* width of the entire scrollbar */
             }
 
             &::-webkit-scrollbar-track {
-              background: #181818; /* color of the tracking area */
+              background: transparent; /* color of the tracking area */
             }
 
             &::-webkit-scrollbar-thumb {
               background-color: white; /* color of the scroll thumb */
               border-radius: 5px; /* roundness of the scroll thumb */
-              border: 3px solid #181818; /* creates padding around scroll thumb */
+              border: transparent; /* creates padding around scroll thumb */
             }
           }
         }
