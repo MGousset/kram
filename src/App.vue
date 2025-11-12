@@ -44,10 +44,8 @@ onMounted(() => {
   window.addEventListener('resize', centerArtistItems)
 })
 
-const animationCount = ref(0)
 const isAtTop = ref(false)
 function innerScrollTo(position: number): void {
-  animationCount.value += 1
   isAtTop.value = position === 0
   scrollTo({ top: position })
 }
@@ -202,18 +200,8 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
 <style lang="scss">
 @import './assets/main.scss';
 
-@keyframes up {
-  from {
-    top: 50%;
-  }
-
-  to {
-    top: -10%;
-  }
-}
-
 #navBar {
-  transition: all ease-in-out 0.3s;
+  transition: all linear 0.35s;
 
   &.up {
     top: 5%;
@@ -251,12 +239,11 @@ header {
 
   #layout {
     z-index: -9;
-    background-color: rgba(0, 0, 0, 0.3);
-    background-image: url('./assets/noise.svg');
+    background-color: rgba(0, 0, 0, 0.2);
   }
 
   #navHeader {
-    transition: all ease-in-out 0.3s;
+    transition: all linear 0.35s;
 
     transform: translate(-50%, -50%);
     position: relative;
@@ -337,8 +324,6 @@ main {
       }
 
       .carouselArtist__class {
-        //background-color: lime;
-        //opacity: 0.5;
         width: 100%;
         height: 660px;
         overflow: hidden;
