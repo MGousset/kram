@@ -31,7 +31,7 @@ function setTitleAnimation(): void {
 
 async function afterLoaded(): Promise<void> {
   if (!isTitleAnimationEnded) {
-    await new Promise((f) => setTimeout(f, 200))
+    await new Promise((f) => setTimeout(f, 100))
     return afterLoaded()
   }
 
@@ -41,7 +41,10 @@ async function afterLoaded(): Promise<void> {
 
 onMounted(() => {
   innerScrollTo(0)
-  window.addEventListener('resize', centerArtistItems)
+  window.addEventListener('resize', () => {
+    innerScrollTo(0)
+    centerArtistItems()
+  })
 })
 
 const isAtTop = ref(false)
@@ -53,7 +56,7 @@ function innerScrollTo(position: number): void {
 async function centerArtistItems(): Promise<void> {
   const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
   if (!artistsMosaiqContainer) {
-    await new Promise((f) => setTimeout(f, 200))
+    await new Promise((f) => setTimeout(f, 100))
     return centerArtistItems()
   }
 
@@ -61,7 +64,7 @@ async function centerArtistItems(): Promise<void> {
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
-    await new Promise((f) => setTimeout(f, 200))
+    await new Promise((f) => setTimeout(f, 100))
     return centerArtistItems()
   }
 

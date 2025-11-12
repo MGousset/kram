@@ -69,7 +69,7 @@ async function afterLoaded(): Promise<void> {
     const track = document.getElementById(trackId)
 
     if (!track) {
-      await new Promise((f) => setTimeout(f, 200))
+      await new Promise((f) => setTimeout(f, 100))
       return afterLoaded()
     }
 
@@ -84,7 +84,7 @@ async function afterLoaded(): Promise<void> {
 async function checkIfAllLoaded(): Promise<void> {
   for (const trackId of props.trackIds) {
     if (!isTrackLoadedById.get(trackId)) {
-      await new Promise((f) => setTimeout(f, 200))
+      await new Promise((f) => setTimeout(f, 100))
       return checkIfAllLoaded()
     }
   }
