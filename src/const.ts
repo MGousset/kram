@@ -1,9 +1,9 @@
 import type { artistesProps } from './components/artistItem.vue'
 import * as THREE from 'three'
 
-import antmoUrl from './assets/img/antmo.jpg'
-import miraUrl from './assets/img/mira.jpeg'
-import ronnieUrl from './assets/img/ronnie.jpg'
+import antmoUrl from '@/assets/img/antmo.jpg'
+import miraUrl from '@/assets/img/mira.jpeg'
+import ronnieUrl from '@/assets/img/ronnie.jpg'
 
 const antmoDesc = [
   'Depuis une décennie, Antmo, artiste polyvalent et cofondateur du collectif KRAM, explore les multiples facettes de la musique électronique.',

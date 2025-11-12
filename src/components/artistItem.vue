@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import DialogItem from './dialogItem.vue'
+import { useWindowSize } from '@vueuse/core'
 
 const SoundCloudSong = defineAsyncComponent(() =>
   import('./soundCloudSong.vue').then((comp) => {
@@ -33,6 +34,10 @@ const emits = defineEmits({
 
 const isTrackLoaded = ref(false)
 
+const width = ref(window.innerWidth)
+const height = ref(window.innerHeight)
+const ratio = computed(() => width.value / height.value)
+
 const backgroundImage = `url(${props.imgUrl})`
 const modalId = `ArtisteItem/${props.name}`
 let dialog: HTMLDialogElement
@@ -40,6 +45,7 @@ let dialog: HTMLDialogElement
 function focus(): void {
   if (dialog) {
     dialog.showModal()
+    onResize()
   }
 }
 
@@ -86,8 +92,16 @@ async function checkIfAllLoaded(): Promise<void> {
   isTrackLoaded.value = true
 }
 
+function onResize(): void {
+  width.value = dialog.clientWidth
+  height.value = dialog.clientHeight
+}
+
 onMounted(() => {
   dialog = document.getElementById(modalId) as HTMLDialogElement
+
+  window.addEventListener('resize', onResize)
+  onResize()
 })
 </script>
 
@@ -110,8 +124,18 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <DialogItem :id="modalId" @close="$emit('focusImage', { isClicked: false })">
-    <div id="dialogContainer" class="w-100 h-100 flex flex-column">
+  <DialogItem
+    :id="modalId"
+    class="dialogContainer"
+    @close="$emit('focusImage', { isClicked: false })"
+  >
+    <div
+      id="dialogContent"
+      class="h-100 w-100 flex flex-column"
+      :style="{
+        overflowY: ratio < 1 ? `hidden` : `auto`,
+      }"
+    >
       <div id="infosContainer" class="color">
         <div id="infosContent" class="h-100 w-100 flex flex-column flex-between">
           <div class="w-100 flex flex-column">
@@ -158,9 +182,22 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div id="detailsContainer" class="w-100">
+      <div
+        id="detailsContainer"
+        class="w-100"
+        :style="{
+          height: ratio < 1 ? `calc(100% - 17rem)` : `unset`,
+        }"
+      >
         <div id="artistImageBackground" class="h-100 w-100"></div>
-        <div id="detailsContent" class="h-100 w-100 flex flex-column">
+        <div
+          id="detailsContent"
+          class="w-100 flex flex-column"
+          :style="{
+            overflowY: ratio < 1 ? `auto` : `hidden`,
+            height: ratio < 1 ? `100%` : `unset`,
+          }"
+        >
           <div id="trackContainer" class="w-100">
             <h3>Mix</h3>
             <div v-show="isTrackLoaded" id="trackContent" class="w-100 flex flex-column">
@@ -267,126 +304,120 @@ onMounted(() => {
   }
 }
 
-#dialogContainer {
-  justify-items: center;
-  position: relative;
-  padding: 0rem;
+.dialogContainer {
+  #dialogContent {
+    justify-items: center;
+    position: relative;
+    padding: 0rem;
 
-  #infosContainer {
-    z-index: 1;
-    border-bottom: 0.125rem $color solid;
+    #infosContainer {
+      z-index: 1;
+      border-bottom: 0.125rem $color solid;
 
-    #infosContent {
-      padding: 2rem;
+      #infosContent {
+        padding: 2rem;
 
-      h2 {
-        margin: 0px;
-      }
-
-      .styleContainer {
-        transition: background-color ease-in-out 0.1s;
-        background-color: rgba(255, 255, 255, 0.7);
-        color: black !important;
-        margin-left: 0rem !important;
-
-        &:hover {
-          background-color: rgba(255, 255, 255, 1);
+        h2 {
+          margin: 0px;
         }
-      }
 
-      #iconsConatiner {
-        margin-left: 0.125rem;
-        a {
-          padding: 0px;
-          margin-right: 1rem;
-          i {
-            color: rgba(255, 255, 255, 1);
-            font-size: 2rem;
+        .styleContainer {
+          transition: background-color ease-in-out 0.1s;
+          background-color: rgba(255, 255, 255, 0.7);
+          color: black !important;
+          margin-left: 0rem !important;
 
-            &:hover {
+          &:hover {
+            background-color: rgba(255, 255, 255, 1);
+          }
+        }
+
+        #iconsConatiner {
+          margin-left: 0.125rem;
+          a {
+            padding: 0px;
+            margin-right: 1rem;
+            i {
               color: rgba(255, 255, 255, 1);
+              font-size: 2rem;
+
+              &:hover {
+                color: rgba(255, 255, 255, 1);
+              }
             }
           }
         }
-      }
 
-      #bookButton {
-        margin-top: 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        visibility: visible;
-        width: 10rem;
-        height: fit-content;
-        padding: 0.75rem;
-        background-color: rgba(255, 255, 255, 1);
-        color: $color-inverse !important;
-        align-self: flex-end;
+        #bookButton {
+          margin-top: 1rem;
+          border-radius: 5px;
+          cursor: pointer;
+          visibility: visible;
+          width: 10rem;
+          height: fit-content;
+          padding: 0.75rem;
+          background-color: rgba(255, 255, 255, 1);
+          color: $color-inverse !important;
+          align-self: flex-end;
 
-        transition: transform, ease-in-out, 0.1s;
-        &:hover {
-          box-shadow: 0.25rem 0.25rem 0rem 0rem white;
-          transform: translate(-0.25rem, -0.25rem);
-        }
+          transition: transform, ease-in-out, 0.1s;
+          &:hover {
+            box-shadow: 0.25rem 0.25rem 0rem 0rem white;
+            transform: translate(-0.25rem, -0.25rem);
+          }
 
-        h4 {
-          margin: 0px;
-        }
-      }
-    }
-  }
-
-  #detailsContainer {
-    height: calc(100% - 17rem);
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.3);
-
-    h3,
-    p,
-    span {
-      color: $color;
-    }
-
-    #artistImageBackground {
-      z-index: -1;
-      position: absolute;
-      background-image: v-bind(backgroundImage);
-      background-size: 110%;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    #detailsContent {
-      &::-webkit-scrollbar {
-        display: none;
-      }
-
-      -ms-overflow-style: none;
-      overflow: -moz-scrollbars-none;
-
-      overscroll-behavior: contain;
-      overflow-y: auto;
-
-      #trackContainer,
-      #descriptionContainer {
-        padding: 2rem;
-      }
-      #trackContainer {
-        #trackContent {
-          .trackItem {
-            margin-bottom: 0.5rem;
-            margin-top: 0.5rem;
+          h4 {
+            margin: 0px;
           }
         }
       }
+    }
 
-      #loading {
-        background-image: url('./assets/img/loading.gif');
-        height: 7rem;
+    #detailsContainer {
+      position: relative;
+      background-color: rgba(0, 0, 0, 0.3);
+
+      h3,
+      p,
+      span {
+        color: $color;
       }
 
-      #descriptionContainer {
-        #descriptionContent {
-          overflow-y: auto;
+      #artistImageBackground {
+        z-index: -1;
+        position: absolute;
+        background-image: v-bind(backgroundImage);
+        background-size: 110%;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      #detailsContent {
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        -ms-overflow-style: none;
+        overflow: -moz-scrollbars-none;
+
+        overscroll-behavior: contain;
+
+        #trackContainer,
+        #descriptionContainer {
+          padding: 2rem;
+        }
+        #trackContainer {
+          #trackContent {
+            .trackItem {
+              margin-bottom: 0.5rem;
+              margin-top: 0.5rem;
+            }
+          }
+        }
+
+        #loading {
+          background-image: url('./assets/loading.gif');
+          height: 7rem;
         }
       }
     }
