@@ -433,8 +433,13 @@ onMounted(() => {
         }
 
         #loading {
-          background-image: url('./assets/loading.gif');
-          height: 7rem;
+          background-image: url('@/assets/img/loading.gif');
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 15%;
+          height: 9rem;
+          max-height: 9rem;
+          aspect-ratio: 1;
         }
       }
     }

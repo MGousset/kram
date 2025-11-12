@@ -47,7 +47,7 @@ const isMobile = detectMobile()
 
   #scenePic {
     background-image: url('@/assets/img/fixedBg.jpg');
-    background-color: bisque;
+    background-color: #181818;
   }
 }
 </style>
