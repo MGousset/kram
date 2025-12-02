@@ -18,6 +18,7 @@ export type artistesProps = {
   cutPercent?: string
   styles: string[]
   trackIds: string[]
+  prodIds: string[]
   network?: { insta?: string; soundCloud?: string }
   classes?: string
 }
@@ -33,6 +34,7 @@ const emits = defineEmits({
 })
 
 const isTrackLoaded = ref(false)
+const isProdLoaded = ref(false)
 
 const width = ref(window.innerWidth)
 const height = ref(window.innerHeight)
@@ -72,19 +74,56 @@ function setTrackAsLoaded(id: string) {
   isTrackLoaded.value = true
 }
 
-async function afterLoaded(): Promise<void> {
+const isProdLoadedById = new Map<string, boolean>()
+for (const trackId of props.trackIds) {
+  isTrackLoadedById.set(trackId, false)
+}
+
+function setProdAsLoaded(id: string) {
+  isProdLoadedById.set(id, true)
+
+  for (const prodId of props.prodIds) {
+    if (!isProdLoadedById.get(prodId)) {
+      return
+    }
+  }
+
+  isProdLoaded.value = true
+}
+
+async function setTracksListener(): Promise<void> {
   for (const trackId of props.trackIds) {
     const track = document.getElementById(trackId)
 
     if (!track) {
       await new Promise((f) => setTimeout(f, 100))
-      return afterLoaded()
+      setTracksListener()
     }
 
     ;(track as HTMLIFrameElement).onload = () => {
       setTrackAsLoaded(trackId)
     }
   }
+}
+
+async function setProdsListener(): Promise<void> {
+  for (const prodId of props.prodIds) {
+    const prod = document.getElementById(prodId)
+
+    if (!prod) {
+      await new Promise((f) => setTimeout(f, 100))
+      setProdsListener()
+    }
+
+    ;(prod as HTMLIFrameElement).onload = () => {
+      setProdAsLoaded(prodId)
+    }
+  }
+}
+
+function afterLoaded(): void {
+  setTracksListener()
+  setProdsListener()
 }
 
 function onResize(): void {
@@ -193,7 +232,7 @@ onMounted(() => {
             height: ratio < 1 ? `100%` : `unset`,
           }"
         >
-          <div id="trackContainer" class="w-100">
+          <div v-if="props.trackIds.length" id="trackContainer" class="w-100">
             <h3>Mix</h3>
             <div v-show="isTrackLoaded" id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
@@ -207,6 +246,22 @@ onMounted(() => {
               id="loading"
               class="w-100 flex flex-center flex-align-center"
               v-show="!isTrackLoaded"
+            ></div>
+          </div>
+          <div v-if="props.prodIds.length" id="trackContainer" class="w-100">
+            <h3>Production</h3>
+            <div v-show="isProdLoaded" id="trackContent" class="w-100 flex flex-column">
+              <SoundCloudSong
+                v-for="id in props.prodIds"
+                :key="id"
+                :id="id"
+                classes="trackItem"
+              ></SoundCloudSong>
+            </div>
+            <div
+              id="loading"
+              class="w-100 flex flex-center flex-align-center"
+              v-show="!isProdLoaded"
             ></div>
           </div>
           <div id="descriptionContainer" class="w-100">
@@ -396,12 +451,14 @@ onMounted(() => {
       #artistImageBackground {
         position: absolute;
         background-image: v-bind(backgroundImage);
+
         background-size: 110%;
         background-position: center;
         background-repeat: no-repeat;
       }
 
       #detailsContent {
+        background-color: rgba(0, 0, 0, 0.3);
         position: relative;
         z-index: 1;
 

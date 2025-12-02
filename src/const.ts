@@ -2,14 +2,20 @@ import type { artistesProps } from './components/artistItem.vue'
 import * as THREE from 'three'
 
 import antmoUrl from '@/assets/img/antmo.jpg'
+import blancSoleilUrl from '@/assets/img/blancSoleil.png'
 import miraUrl from '@/assets/img/mira.jpeg'
 import ronnieUrl from '@/assets/img/ronnie.jpg'
 
 const antmoDesc = [
-  'Depuis une décennie, Antmo, artiste polyvalent et cofondateur du collectif KRAM, explore les multiples facettes de la musique électronique.',
-  'Sa passion ardente pour la musique le conduit à travers un panorama sonore vaste, allant de la techno hypnotique aux vibrations envoûtantes de la trance, en passant par les rythmes énergiques aux influences britanniques.',
-  "Doté d'une sensibilité musicale aiguisée, Antmo adore naviguer entre les différents styles, créant ainsi des sets captivants et dynamiques. Son objectif : partager avec le public l'émotion et l'énergie qu'il ressent derrière les decks.",
-  'Entre deux sessions de mix, Antmo se plonge dans la recherche de nouvelles pépites musicales pour étoffer ses playlists. Cette quête lui permet de se renouveler constamment et de proposer à son public une expérience sonore originale à chaque performance.',
+  'DJ brestois à l’origine du collectif KRAM, son style est taillé pour le club avec une techno sans concession, axée sur l’efficacité.',
+  'Il construit ses sets en mêlant la répétition mentale de la techno hypnotique à un groove constant porté par ses tracks hardgroove.',
+  'Son objectif est clair : maintenir la tension et vous faire bouger du début à la fin.',
+]
+
+const blancSoleilDesc = [
+  'Blanc Soleil est une voix nouvelle de la scène électronique française.',
+  'Il mêle rythmes percussifs, breaks inspirés de la scène Britannique et textures atmosphériques, construisant un son qui oscille entre énergie brute et émotion profonde.',
+  'Nourris par ses voyages, ses souvenirs et la culture club, ses sets et ses productions sont riches, immersifs et taillés pour le dancefloor.',
 ]
 
 const miraDesc = [
@@ -28,7 +34,7 @@ const ronnieDesc = [
 
 export const artistes: artistesProps[] = [
   {
-    name: 'ANTMO',
+    name: 'Antmo',
     description: antmoDesc,
     imgUrl: antmoUrl,
     cutPercent: '78',
@@ -38,6 +44,27 @@ export const artistes: artistesProps[] = [
       soundCloud: 'https://soundcloud.com/krambzh/sets/antmo',
     },
     trackIds: ['253A2190957747', '253A2190957507', '253A2056585340'],
+    prodIds: [],
+  },
+  {
+    name: 'Blanc Soleil',
+    description: blancSoleilDesc,
+    imgUrl: blancSoleilUrl,
+    styles: ['UKG', 'Bouncy House', 'Dance'],
+    network: {
+      insta: 'https://www.instagram.com/blancsoleil_/',
+      soundCloud: 'https://soundcloud.com/blancsoleil',
+    },
+    trackIds: ['253A2221519568'],
+    prodIds: [
+      '253A2180696507',
+      '253A2180684051',
+      '253A2180681691',
+      '253A2180682495',
+      '253A2180686759',
+      '253A2180683219',
+      '253A2180688351',
+    ],
   },
   {
     name: 'MIRA',
@@ -55,10 +82,11 @@ export const artistes: artistesProps[] = [
       '253A2134135164',
       '253A2047582812',
     ],
+    prodIds: [],
     cutPercent: '29',
   },
   {
-    name: 'RONNIE',
+    name: 'Ronnie',
     description: ronnieDesc,
     imgUrl: ronnieUrl,
     styles: ['House', 'Hard House', 'Trance'],
@@ -67,6 +95,7 @@ export const artistes: artistesProps[] = [
       soundCloud: 'https://soundcloud.com/raoul-rivier',
     },
     trackIds: ['253A2197414259', '253A2197390623', '253A2177484102', '253A2191290279'],
+    prodIds: [],
     cutPercent: '32',
   },
 ]
@@ -77,6 +106,13 @@ export const colorByImageUrl: Map<string, { color1: THREE.Color; color2: THREE.C
     {
       color1: new THREE.Color(156 + 50, 221 + 50, 214 + 50),
       color2: new THREE.Color(0 + 50, 142 + 50, 145 + 50),
+    },
+  ],
+  [
+    blancSoleilUrl,
+    {
+      color1: new THREE.Color(255, 251, 241),
+      color2: new THREE.Color(145, 93, 69),
     },
   ],
   [
