@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import * as THREE from 'three'
 import sceneItem from './components/sceneItem.vue'
+
+import bgUrl from '@/assets/img/fixedBg.jpg'
+const bgImg = `url${bgUrl}`
 
 const { animated, bgColors } = defineProps<{
   animated: boolean
@@ -23,7 +25,7 @@ function detectMobile(): boolean {
     toMatch.some((toMatchItem) => {
       return navigator.userAgent.match(toMatchItem)
     }) ||
-    (screen.width <= 800 && screen.height <= 600)
+    (screen.height <= 800 && screen.width <= 600)
   )
 }
 
@@ -33,7 +35,7 @@ const isMobile = detectMobile()
 <template>
   <div id="backgroundContainer">
     <div v-if="isMobile" id="scenePic" class="w-100 h-100"></div>
-    <sceneItem v-else id="scene" :bgColors="bgColors" :animated></sceneItem>
+    <sceneItem v-else id="scene" :bgColors="bgColors" :animated="animated && !isMobile"></sceneItem>
   </div>
 </template>
 
@@ -44,8 +46,8 @@ const isMobile = detectMobile()
   overflow: hidden;
 
   #scenePic {
-    background-image: url('./assets/img/fixedBg.png');
-    background-color: bisque;
+    background-image: url('@/assets/img/fixedBg.jpg');
+    background-color: #181818;
   }
 }
 </style>

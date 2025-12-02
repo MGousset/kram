@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import DialogItem from './dialogItem.vue'
+import { useWindowSize } from '@vueuse/core'
 
 const SoundCloudSong = defineAsyncComponent(() =>
   import('./soundCloudSong.vue').then((comp) => {
@@ -17,6 +18,7 @@ export type artistesProps = {
   cutPercent?: string
   styles: string[]
   trackIds: string[]
+  prodIds: string[]
   network?: { insta?: string; soundCloud?: string }
   classes?: string
 }
@@ -32,6 +34,11 @@ const emits = defineEmits({
 })
 
 const isTrackLoaded = ref(false)
+const isProdLoaded = ref(false)
+
+const width = ref(window.innerWidth)
+const height = ref(window.innerHeight)
+const ratio = computed(() => width.value / height.value)
 
 const backgroundImage = `url(${props.imgUrl})`
 const modalId = `ArtisteItem/${props.name}`
@@ -40,6 +47,7 @@ let dialog: HTMLDialogElement
 function focus(): void {
   if (dialog) {
     dialog.showModal()
+    onResize()
   }
 }
 
@@ -56,38 +64,78 @@ for (const trackId of props.trackIds) {
 
 function setTrackAsLoaded(id: string) {
   isTrackLoadedById.set(id, true)
-}
 
-async function afterLoaded(): Promise<void> {
-  for (const trackId of props.trackIds) {
-    const track = document.getElementById(trackId)
-
-    if (!track) {
-      await new Promise((f) => setTimeout(f, 200))
-      return afterLoaded()
-    }
-
-    ;(track as HTMLIFrameElement).onload = () => {
-      setTrackAsLoaded(trackId)
-    }
-  }
-
-  checkIfAllLoaded()
-}
-
-async function checkIfAllLoaded(): Promise<void> {
   for (const trackId of props.trackIds) {
     if (!isTrackLoadedById.get(trackId)) {
-      await new Promise((f) => setTimeout(f, 200))
-      return checkIfAllLoaded()
+      return
     }
   }
 
   isTrackLoaded.value = true
 }
 
+const isProdLoadedById = new Map<string, boolean>()
+for (const trackId of props.trackIds) {
+  isTrackLoadedById.set(trackId, false)
+}
+
+function setProdAsLoaded(id: string) {
+  isProdLoadedById.set(id, true)
+
+  for (const prodId of props.prodIds) {
+    if (!isProdLoadedById.get(prodId)) {
+      return
+    }
+  }
+
+  isProdLoaded.value = true
+}
+
+async function setTracksListener(): Promise<void> {
+  for (const trackId of props.trackIds) {
+    const track = document.getElementById(trackId)
+
+    if (!track) {
+      await new Promise((f) => setTimeout(f, 100))
+      setTracksListener()
+    }
+
+    ;(track as HTMLIFrameElement).onload = () => {
+      setTrackAsLoaded(trackId)
+    }
+  }
+}
+
+async function setProdsListener(): Promise<void> {
+  for (const prodId of props.prodIds) {
+    const prod = document.getElementById(prodId)
+
+    if (!prod) {
+      await new Promise((f) => setTimeout(f, 100))
+      setProdsListener()
+    }
+
+    ;(prod as HTMLIFrameElement).onload = () => {
+      setProdAsLoaded(prodId)
+    }
+  }
+}
+
+function afterLoaded(): void {
+  setTracksListener()
+  setProdsListener()
+}
+
+function onResize(): void {
+  width.value = dialog.clientWidth
+  height.value = dialog.clientHeight
+}
+
 onMounted(() => {
   dialog = document.getElementById(modalId) as HTMLDialogElement
+
+  window.addEventListener('resize', onResize)
+  onResize()
 })
 </script>
 
@@ -110,8 +158,18 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <DialogItem :id="modalId" @close="$emit('focusImage', { isClicked: false })">
-    <div id="dialogContainer" class="w-100 h-100 flex flex-column">
+  <DialogItem
+    :id="modalId"
+    class="dialogContainer"
+    @close="$emit('focusImage', { isClicked: false })"
+  >
+    <div
+      id="dialogContent"
+      class="h-100 w-100 flex flex-column"
+      :style="{
+        overflowY: ratio < 1 ? `hidden` : `auto`,
+      }"
+    >
       <div id="infosContainer" class="color">
         <div id="infosContent" class="h-100 w-100 flex flex-column flex-between">
           <div class="w-100 flex flex-column">
@@ -158,10 +216,23 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div id="detailsContainer" class="w-100">
+      <div
+        id="detailsContainer"
+        class="w-100"
+        :style="{
+          height: ratio < 1 ? `calc(100% - 17rem)` : `unset`,
+        }"
+      >
         <div id="artistImageBackground" class="h-100 w-100"></div>
-        <div id="detailsContent" class="h-100 w-100 flex flex-column">
-          <div id="trackContainer" class="w-100">
+        <div
+          id="detailsContent"
+          class="w-100 flex flex-column"
+          :style="{
+            overflowY: ratio < 1 ? `auto` : `hidden`,
+            height: ratio < 1 ? `100%` : `unset`,
+          }"
+        >
+          <div v-if="props.trackIds.length" id="trackContainer" class="w-100">
             <h3>Mix</h3>
             <div v-show="isTrackLoaded" id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
@@ -175,6 +246,22 @@ onMounted(() => {
               id="loading"
               class="w-100 flex flex-center flex-align-center"
               v-show="!isTrackLoaded"
+            ></div>
+          </div>
+          <div v-if="props.prodIds.length" id="trackContainer" class="w-100">
+            <h3>Production</h3>
+            <div v-show="isProdLoaded" id="trackContent" class="w-100 flex flex-column">
+              <SoundCloudSong
+                v-for="id in props.prodIds"
+                :key="id"
+                :id="id"
+                classes="trackItem"
+              ></SoundCloudSong>
+            </div>
+            <div
+              id="loading"
+              class="w-100 flex flex-center flex-align-center"
+              v-show="!isProdLoaded"
             ></div>
           </div>
           <div id="descriptionContainer" class="w-100">
@@ -267,126 +354,149 @@ onMounted(() => {
   }
 }
 
-#dialogContainer {
-  justify-items: center;
-  position: relative;
-  padding: 0rem;
+.dialogContainer {
+  #dialogContent {
+    background-color: #181818;
+    justify-items: center;
+    position: relative;
+    padding: 0rem;
 
-  #infosContainer {
-    z-index: 1;
-    border-bottom: 0.125rem $color solid;
+    &::-webkit-scrollbar {
+      width: 0.5rem; /* width of the entire scrollbar */
+    }
 
-    #infosContent {
-      padding: 2rem;
+    &::-webkit-scrollbar-track {
+      background: transparent; /* color of the tracking area */
+    }
 
-      h2 {
-        margin: 0px;
-      }
+    &::-webkit-scrollbar-thumb {
+      background-color: white; /* color of the scroll thumb */
+      border-radius: 5px; /* roundness of the scroll thumb */
+      border: transparent; /* creates padding around scroll thumb */
+    }
 
-      .styleContainer {
-        transition: background-color ease-in-out 0.1s;
-        background-color: rgba(255, 255, 255, 0.7);
-        color: black !important;
-        margin-left: 0rem !important;
+    #infosContainer {
+      z-index: 1;
+      border-bottom: 0.125rem $color solid;
 
-        &:hover {
-          background-color: rgba(255, 255, 255, 1);
+      #infosContent {
+        padding: 2rem;
+
+        h2 {
+          margin: 0px;
         }
-      }
 
-      #iconsConatiner {
-        margin-left: 0.125rem;
-        a {
-          padding: 0px;
-          margin-right: 1rem;
-          i {
-            color: rgba(255, 255, 255, 1);
-            font-size: 2rem;
+        .styleContainer {
+          transition: background-color ease-in-out 0.1s;
+          background-color: rgba(255, 255, 255, 0.7);
+          color: black !important;
+          margin-left: 0rem !important;
 
-            &:hover {
+          &:hover {
+            background-color: rgba(255, 255, 255, 1);
+          }
+        }
+
+        #iconsConatiner {
+          margin-left: 0.125rem;
+          a {
+            padding: 0px;
+            margin-right: 1rem;
+            i {
               color: rgba(255, 255, 255, 1);
+              font-size: 2rem;
+
+              &:hover {
+                color: rgba(255, 255, 255, 1);
+              }
             }
           }
         }
-      }
 
-      #bookButton {
-        margin-top: 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        visibility: visible;
-        width: 10rem;
-        height: fit-content;
-        padding: 0.75rem;
-        background-color: rgba(255, 255, 255, 1);
-        color: $color-inverse !important;
-        align-self: flex-end;
+        #bookButton {
+          margin-top: 1rem;
+          border-radius: 5px;
+          cursor: pointer;
+          visibility: visible;
+          width: 10rem;
+          height: fit-content;
+          padding: 0.75rem;
+          background-color: rgba(255, 255, 255, 1);
+          color: $color-inverse !important;
+          align-self: flex-end;
 
-        transition: transform, ease-in-out, 0.1s;
-        &:hover {
-          box-shadow: 0.25rem 0.25rem 0rem 0rem white;
-          transform: translate(-0.25rem, -0.25rem);
-        }
+          transition: transform, ease-in-out, 0.1s;
+          &:hover {
+            box-shadow: 0.25rem 0.25rem 0rem 0rem white;
+            transform: translate(-0.25rem, -0.25rem);
+          }
 
-        h4 {
-          margin: 0px;
-        }
-      }
-    }
-  }
-
-  #detailsContainer {
-    height: calc(100% - 17rem);
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.3);
-
-    h3,
-    p,
-    span {
-      color: $color;
-    }
-
-    #artistImageBackground {
-      z-index: -1;
-      position: absolute;
-      background-image: v-bind(backgroundImage);
-      background-size: 110%;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    #detailsContent {
-      &::-webkit-scrollbar {
-        display: none;
-      }
-
-      -ms-overflow-style: none;
-      overflow: -moz-scrollbars-none;
-
-      overscroll-behavior: contain;
-      overflow-y: auto;
-
-      #trackContainer,
-      #descriptionContainer {
-        padding: 2rem;
-      }
-      #trackContainer {
-        #trackContent {
-          .trackItem {
-            margin-bottom: 0.5rem;
-            margin-top: 0.5rem;
+          h4 {
+            margin: 0px;
           }
         }
       }
+    }
 
-      #loading {
-        background-image: url('./assets/img/loading.gif');
-        height: 7rem;
+    #detailsContainer {
+      position: relative;
+      background-color: rgba(0, 0, 0, 0.3);
+
+      h3,
+      p,
+      span {
+        color: $color;
       }
 
-      #descriptionContainer {
-        #descriptionContent {
-          overflow-y: auto;
+      #artistImageBackground {
+        position: absolute;
+        background-image: v-bind(backgroundImage);
+
+        background-size: 110%;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      #detailsContent {
+        background-color: rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+
+        &::-webkit-scrollbar {
+          width: 0.5rem; /* width of the entire scrollbar */
+        }
+
+        &::-webkit-scrollbar-track {
+          background: transparent; /* color of the tracking area */
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: white; /* color of the scroll thumb */
+          border-radius: 5px; /* roundness of the scroll thumb */
+          border: transparent; /* creates padding around scroll thumb */
+        }
+
+        #trackContainer,
+        #descriptionContainer {
+          padding: 2rem;
+        }
+        #trackContainer {
+          #trackContent {
+            .trackItem {
+              margin-bottom: 0.5rem;
+              margin-top: 0.5rem;
+            }
+          }
+        }
+
+        #loading {
+          background-image: url('@/assets/img/loading.gif');
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 15%;
+          height: 9rem;
+          max-height: 9rem;
+          aspect-ratio: 1;
         }
       }
     }

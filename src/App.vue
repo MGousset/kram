@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import * as THREE from 'three'
-import { defineAsyncComponent, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { ANIMATION } from '@/tools/tools'
 import { artistes, colorByImageUrl } from './const'
 
 import AnimatedText from './components/animatedText.vue'
 import LeftRightAnimated from './components/leftRightAnimated.vue'
 import AnimatedBg from './components/animatedBg/animatedBg.vue'
-
-const ArtistItem = defineAsyncComponent(() =>
-  import('./components/artistItem.vue').then((comp) => {
-    afterLoaded()
-    return comp
-  }),
-)
+import ArtistItem from './components/artistItem.vue'
 
 const isBgAnimated = ref(true) // TODO put false for dev
 const linkOpacity = ref(0)
@@ -24,30 +18,21 @@ const defaultbgColors = {
 }
 const bgColors = ref(defaultbgColors)
 
-let isTitleAnimationEnded = false
-function setTitleAnimation(): void {
-  isTitleAnimationEnded = true
-}
-
-async function afterLoaded(): Promise<void> {
-  if (!isTitleAnimationEnded) {
-    await new Promise((f) => setTimeout(f, 200))
-    return afterLoaded()
-  }
-
+async function afterAnimation(): Promise<void> {
   await centerArtistItems()
   linkOpacity.value = 1
 }
 
 onMounted(() => {
   innerScrollTo(0)
-  window.addEventListener('resize', centerArtistItems)
+  window.addEventListener('resize', () => {
+    innerScrollTo(0)
+    centerArtistItems()
+  })
 })
 
-const animationCount = ref(0)
 const isAtTop = ref(false)
 function innerScrollTo(position: number): void {
-  animationCount.value += 1
   isAtTop.value = position === 0
   scrollTo({ top: position })
 }
@@ -55,7 +40,7 @@ function innerScrollTo(position: number): void {
 async function centerArtistItems(): Promise<void> {
   const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
   if (!artistsMosaiqContainer) {
-    await new Promise((f) => setTimeout(f, 200))
+    await new Promise((f) => setTimeout(f, 100))
     return centerArtistItems()
   }
 
@@ -63,7 +48,7 @@ async function centerArtistItems(): Promise<void> {
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
-    await new Promise((f) => setTimeout(f, 200))
+    await new Promise((f) => setTimeout(f, 100))
     return centerArtistItems()
   }
 
@@ -143,7 +128,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
           textClasses="title"
           :onMontedAnimation="ANIMATION.randomstep"
           :onHoverLetterAnimation="ANIMATION.grow"
-          @finished="() => setTitleAnimation()"
+          @finished="() => afterAnimation()"
         ></AnimatedText>
       </div>
     </div>
@@ -170,6 +155,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
                 :styles="artiste.styles"
                 :network="artiste.network"
                 :trackIds="artiste.trackIds"
+                :prodIds="artiste.prodIds"
                 classes="artistItem"
                 @focus-image="(p: { id: string; isClicked: boolean }) => changeBgColors(p)"
               ></ArtistItem>
@@ -192,6 +178,13 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
       <a
         class="flex flex-center flex-align-center"
         target="_blank"
+        href="https://soundcloud.com/krambzh"
+      >
+        <i class="fa fa-soundcloud" aria-hidden="true"></i>
+      </a>
+      <a
+        class="flex flex-center flex-align-center"
+        target="_blank"
         href="mailto:contact@kram-agency.com"
         ><i class="fa fa-envelope" aria-hidden="true"></i
       ></a>
@@ -202,18 +195,8 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
 <style lang="scss">
 @import './assets/main.scss';
 
-@keyframes up {
-  from {
-    top: 50%;
-  }
-
-  to {
-    top: -10%;
-  }
-}
-
 #navBar {
-  transition: all ease-in-out 0.3s;
+  transition: all linear 0.35s;
 
   &.up {
     top: 5%;
@@ -251,12 +234,11 @@ header {
 
   #layout {
     z-index: -9;
-    background-color: rgba(0, 0, 0, 0.3);
-    background-image: url('./assets/noise.svg');
+    background-color: rgba(0, 0, 0, 0.2);
   }
 
   #navHeader {
-    transition: all ease-in-out 0.3s;
+    transition: all linear 0.35s;
 
     transform: translate(-50%, -50%);
     position: relative;
@@ -310,17 +292,17 @@ main {
             overflow-y: auto;
 
             &::-webkit-scrollbar {
-              width: 12px; /* width of the entire scrollbar */
+              width: 0.5rem; /* width of the entire scrollbar */
             }
 
             &::-webkit-scrollbar-track {
-              background: #181818; /* color of the tracking area */
+              background: transparent; /* color of the tracking area */
             }
 
             &::-webkit-scrollbar-thumb {
               background-color: white; /* color of the scroll thumb */
               border-radius: 5px; /* roundness of the scroll thumb */
-              border: 3px solid #181818; /* creates padding around scroll thumb */
+              border: transparent; /* creates padding around scroll thumb */
             }
           }
         }
@@ -337,8 +319,6 @@ main {
       }
 
       .carouselArtist__class {
-        //background-color: lime;
-        //opacity: 0.5;
         width: 100%;
         height: 660px;
         overflow: hidden;
