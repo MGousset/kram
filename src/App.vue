@@ -52,7 +52,7 @@ async function centerArtistItems(): Promise<void> {
     return centerArtistItems()
   }
 
-  const minWidth = 300
+  const minWidth = 250
   const maxWidth = 450
   const minMargin = 16
   const containerWidth = artistsMosaiqContainer.clientWidth - minMargin
@@ -156,6 +156,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
                 :network="artiste.network"
                 :trackIds="artiste.trackIds"
                 :prodIds="artiste.prodIds"
+                :imageCenter="artiste.imageCenter"
                 classes="artistItem"
                 @focus-image="(p: { id: string; isClicked: boolean }) => changeBgColors(p)"
               ></ArtistItem>
@@ -203,6 +204,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
   }
 
   z-index: 100;
+  max-width: 100%;
   width: 25rem;
   left: 50%;
   top: 65%;

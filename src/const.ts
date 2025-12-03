@@ -45,12 +45,13 @@ export const artistes: artistesProps[] = [
     },
     trackIds: ['253A2190957747', '253A2190957507', '253A2056585340'],
     prodIds: [],
+    imageCenter: 70,
   },
   {
     name: 'Blanc Soleil',
     description: blancSoleilDesc,
     imgUrl: blancSoleilUrl,
-    styles: ['UKG', 'Bouncy House', 'Dance'],
+    styles: ['Break/Techno', 'UKG', 'Dance'],
     network: {
       insta: 'https://www.instagram.com/blancsoleil_/',
       soundCloud: 'https://soundcloud.com/blancsoleil',
@@ -65,6 +66,7 @@ export const artistes: artistesProps[] = [
       '253A2180683219',
       '253A2180688351',
     ],
+    imageCenter: 20,
   },
   {
     name: 'MIRA',
@@ -84,6 +86,7 @@ export const artistes: artistesProps[] = [
     ],
     prodIds: [],
     cutPercent: '29',
+    imageCenter: 30,
   },
   {
     name: 'Ronnie',
@@ -97,6 +100,7 @@ export const artistes: artistesProps[] = [
     trackIds: ['253A2197414259', '253A2197390623', '253A2177484102', '253A2191290279'],
     prodIds: [],
     cutPercent: '32',
+    imageCenter: 30,
   },
 ]
 

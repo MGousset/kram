@@ -55,3 +55,22 @@ export function growElementText(element: HTMLElement, multiplier: number): strin
   element.style.fontSize = multiplier * currentSize + unity
   return currentFont
 }
+
+export function detectMobile(): boolean {
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i,
+  ]
+
+  return (
+    toMatch.some((toMatchItem) => {
+      return navigator.userAgent.match(toMatchItem)
+    }) ||
+    (screen.height <= 800 && screen.width <= 600)
+  )
+}
