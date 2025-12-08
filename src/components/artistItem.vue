@@ -2,6 +2,7 @@
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import DialogItem from './dialogItem.vue'
 import { useWindowSize } from '@vueuse/core'
+import { detectMobile } from '@/tools/tools'
 
 const SoundCloudSong = defineAsyncComponent(() =>
   import('./soundCloudSong.vue').then((comp) => {
@@ -18,6 +19,8 @@ export type artistesProps = {
   cutPercent?: string
   styles: string[]
   trackIds: string[]
+  prodIds: string[]
+  imageCenter: number
   network?: { insta?: string; soundCloud?: string }
   classes?: string
 }
@@ -33,10 +36,7 @@ const emits = defineEmits({
 })
 
 const isTrackLoaded = ref(false)
-
-const width = ref(window.innerWidth)
-const height = ref(window.innerHeight)
-const ratio = computed(() => width.value / height.value)
+const isProdLoaded = ref(false)
 
 const backgroundImage = `url(${props.imgUrl})`
 const modalId = `ArtisteItem/${props.name}`
@@ -45,7 +45,6 @@ let dialog: HTMLDialogElement
 function focus(): void {
   if (dialog) {
     dialog.showModal()
-    onResize()
   }
 }
 
@@ -54,6 +53,10 @@ function openPage(url?: string): void {
     window.open(url, '_blank')?.focus()
   }
 }
+
+onMounted(() => {
+  dialog = document.getElementById(modalId) as HTMLDialogElement
+})
 
 const isTrackLoadedById = new Map<string, boolean>()
 for (const trackId of props.trackIds) {
@@ -72,13 +75,30 @@ function setTrackAsLoaded(id: string) {
   isTrackLoaded.value = true
 }
 
-async function afterLoaded(): Promise<void> {
+const isProdLoadedById = new Map<string, boolean>()
+for (const trackId of props.trackIds) {
+  isTrackLoadedById.set(trackId, false)
+}
+
+function setProdAsLoaded(id: string) {
+  isProdLoadedById.set(id, true)
+
+  for (const prodId of props.prodIds) {
+    if (!isProdLoadedById.get(prodId)) {
+      return
+    }
+  }
+
+  isProdLoaded.value = true
+}
+
+async function setTracksListener(): Promise<void> {
   for (const trackId of props.trackIds) {
     const track = document.getElementById(trackId)
 
     if (!track) {
       await new Promise((f) => setTimeout(f, 100))
-      return afterLoaded()
+      setTracksListener()
     }
 
     ;(track as HTMLIFrameElement).onload = () => {
@@ -87,17 +107,33 @@ async function afterLoaded(): Promise<void> {
   }
 }
 
-function onResize(): void {
-  width.value = dialog.clientWidth
-  height.value = dialog.clientHeight
+async function setProdsListener(): Promise<void> {
+  for (const prodId of props.prodIds) {
+    const prod = document.getElementById(prodId)
+
+    if (!prod) {
+      await new Promise((f) => setTimeout(f, 100))
+      setProdsListener()
+    }
+
+    ;(prod as HTMLIFrameElement).onload = () => {
+      setProdAsLoaded(prodId)
+    }
+  }
 }
 
-onMounted(() => {
-  dialog = document.getElementById(modalId) as HTMLDialogElement
+function afterLoaded(): void {
+  setTracksListener()
+  setProdsListener()
+}
 
-  window.addEventListener('resize', onResize)
-  onResize()
-})
+const isMobile = detectMobile()
+let classes = props.classes
+if (isMobile) {
+  classes += ' isMobile'
+}
+
+const backgroundPosition = `50% ${props.imageCenter}%`
 </script>
 
 <template>
@@ -124,13 +160,7 @@ onMounted(() => {
     class="dialogContainer"
     @close="$emit('focusImage', { isClicked: false })"
   >
-    <div
-      id="dialogContent"
-      class="h-100 w-100 flex flex-column"
-      :style="{
-        overflowY: ratio < 1 ? `hidden` : `auto`,
-      }"
-    >
+    <div id="dialogContent" class="h-100 w-100 flex flex-column">
       <div id="infosContainer" class="color">
         <div id="infosContent" class="h-100 w-100 flex flex-column flex-between">
           <div class="w-100 flex flex-column">
@@ -177,24 +207,17 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div
-        id="detailsContainer"
-        class="w-100"
-        :style="{
-          height: ratio < 1 ? `calc(100% - 17rem)` : `unset`,
-        }"
-      >
+      <div id="detailsContainer" class="w-100 detailsContainer">
         <div id="artistImageBackground" class="h-100 w-100"></div>
-        <div
-          id="detailsContent"
-          class="w-100 flex flex-column"
-          :style="{
-            overflowY: ratio < 1 ? `auto` : `hidden`,
-            height: ratio < 1 ? `100%` : `unset`,
-          }"
-        >
-          <div id="trackContainer" class="w-100">
-            <h3>Mix</h3>
+        <div id="detailsContent" class="w-100 flex flex-column">
+          <div id="descriptionContainer" class="w-100">
+            <h3>Bio</h3>
+            <div id="descriptionContent" class="flex flex-column flex-center">
+              <p v-for="line in props.description" :key="line">{{ line }}</p>
+            </div>
+          </div>
+          <div v-if="props.trackIds.length" id="trackContainer" class="w-100">
+            <h3>Sets</h3>
             <div v-show="isTrackLoaded" id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
                 v-for="id in props.trackIds"
@@ -209,11 +232,21 @@ onMounted(() => {
               v-show="!isTrackLoaded"
             ></div>
           </div>
-          <div id="descriptionContainer" class="w-100">
-            <h3>Description</h3>
-            <div id="descriptionContent" class="flex flex-column flex-center">
-              <p v-for="line in props.description" :key="line">{{ line }}</p>
+          <div v-if="props.prodIds.length" id="trackContainer" class="w-100">
+            <h3>Productions</h3>
+            <div v-show="isProdLoaded" id="trackContent" class="w-100 flex flex-column">
+              <SoundCloudSong
+                v-for="id in props.prodIds"
+                :key="id"
+                :id="id"
+                classes="trackItem"
+              ></SoundCloudSong>
             </div>
+            <div
+              id="loading"
+              class="w-100 flex flex-center flex-align-center"
+              v-show="!isProdLoaded"
+            ></div>
           </div>
         </div>
       </div>
@@ -227,7 +260,6 @@ onMounted(() => {
 #artistContainer {
   cursor: pointer;
   transition: grayscale, ease-in-out, 0.3s;
-  transition: background-color, ease-in-out, 0.3s;
 
   position: relative;
   background-image: v-bind(backgroundImage);
@@ -236,7 +268,12 @@ onMounted(() => {
   background-repeat: no-repeat;
   border-radius: 5px;
 
-  filter: grayscale(1);
+  filter: grayscale(0.8);
+
+  &.isMobile {
+    filter: grayscale(0.3);
+  }
+
   &:hover {
     filter: grayscale(0);
     background-size: 140%;
@@ -282,6 +319,11 @@ onMounted(() => {
 
 #infosContainer {
   padding: 0.5rem;
+  h2 {
+    @media screen and (max-width: 550px) {
+      font-size: 3rem !important;
+    }
+  }
 
   .styleContainer {
     transition: background-color ease-in-out 0.1s;
@@ -321,7 +363,9 @@ onMounted(() => {
     }
 
     #infosContainer {
+      padding: 0rem;
       z-index: 1;
+      height: 17rem;
       border-bottom: 0.125rem $color solid;
 
       #infosContent {
@@ -329,6 +373,10 @@ onMounted(() => {
 
         h2 {
           margin: 0px;
+
+          @media screen and (max-width: 550px) {
+            font-size: 2rem;
+          }
         }
 
         .styleContainer {
@@ -348,7 +396,7 @@ onMounted(() => {
             padding: 0px;
             margin-right: 1rem;
             i {
-              color: rgba(255, 255, 255, 1);
+              color: rgba(255, 255, 255, 0.7);
               font-size: 2rem;
 
               &:hover {
@@ -384,8 +432,8 @@ onMounted(() => {
     }
 
     #detailsContainer {
+      height: calc(100% - 17rem);
       position: relative;
-      background-color: rgba(0, 0, 0, 0.3);
 
       h3,
       p,
@@ -396,14 +444,17 @@ onMounted(() => {
       #artistImageBackground {
         position: absolute;
         background-image: v-bind(backgroundImage);
-        background-size: 110%;
-        background-position: center;
+        background-size: 120%;
+        background-position: v-bind(backgroundPosition);
         background-repeat: no-repeat;
       }
 
       #detailsContent {
+        background-color: rgba(0, 0, 0, 0.4);
         position: relative;
         z-index: 1;
+        height: 100%;
+        overflow-y: auto;
 
         &::-webkit-scrollbar {
           width: 0.5rem; /* width of the entire scrollbar */
@@ -421,7 +472,7 @@ onMounted(() => {
 
         #trackContainer,
         #descriptionContainer {
-          padding: 2rem;
+          padding: 0.5rem 2rem;
         }
         #trackContainer {
           #trackContent {

@@ -8,7 +8,7 @@ export type artistesProps = {
 }
 
 const { id, classes } = defineProps<artistesProps>()
-const src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%${id}&color=%23ff5500&inverse=true&auto_play=false&show_user=true`
+const src = `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%${id}&color=%00000000&inverse=true&auto_play=false&show_user=true`
 
 let iframe: HTMLIFrameElement
 onMounted(() => {

@@ -105,7 +105,7 @@ const animate = async (): Promise<void> => {
   uniforms.u_color1 = { value: bgColors.color1 }
   uniforms.u_color2 = { value: bgColors.color2 }
 
-  uniforms.u_time.value += stepDuration / 10000
+  uniforms.u_time.value += stepDuration / 5000
   renderer.render(scene, camera)
 
   await new Promise((f) => setTimeout(f, stepDuration * 100))

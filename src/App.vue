@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import * as THREE from 'three'
-import { defineAsyncComponent, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { ANIMATION } from '@/tools/tools'
 import { artistes, colorByImageUrl } from './const'
 
 import AnimatedText from './components/animatedText.vue'
 import LeftRightAnimated from './components/leftRightAnimated.vue'
 import AnimatedBg from './components/animatedBg/animatedBg.vue'
-
-const ArtistItem = defineAsyncComponent(() =>
-  import('./components/artistItem.vue').then((comp) => {
-    afterLoaded()
-    return comp
-  }),
-)
+import ArtistItem from './components/artistItem.vue'
 
 const isBgAnimated = ref(true) // TODO put false for dev
 const linkOpacity = ref(0)
@@ -24,17 +18,7 @@ const defaultbgColors = {
 }
 const bgColors = ref(defaultbgColors)
 
-let isTitleAnimationEnded = false
-function setTitleAnimation(): void {
-  isTitleAnimationEnded = true
-}
-
-async function afterLoaded(): Promise<void> {
-  if (!isTitleAnimationEnded) {
-    await new Promise((f) => setTimeout(f, 100))
-    return afterLoaded()
-  }
-
+async function afterAnimation(): Promise<void> {
   await centerArtistItems()
   linkOpacity.value = 1
 }
@@ -68,7 +52,7 @@ async function centerArtistItems(): Promise<void> {
     return centerArtistItems()
   }
 
-  const minWidth = 300
+  const minWidth = 250
   const maxWidth = 450
   const minMargin = 16
   const containerWidth = artistsMosaiqContainer.clientWidth - minMargin
@@ -144,7 +128,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
           textClasses="title"
           :onMontedAnimation="ANIMATION.randomstep"
           :onHoverLetterAnimation="ANIMATION.grow"
-          @finished="() => setTitleAnimation()"
+          @finished="() => afterAnimation()"
         ></AnimatedText>
       </div>
     </div>
@@ -171,6 +155,8 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
                 :styles="artiste.styles"
                 :network="artiste.network"
                 :trackIds="artiste.trackIds"
+                :prodIds="artiste.prodIds"
+                :imageCenter="artiste.imageCenter"
                 classes="artistItem"
                 @focus-image="(p: { id: string; isClicked: boolean }) => changeBgColors(p)"
               ></ArtistItem>
@@ -193,6 +179,13 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
       <a
         class="flex flex-center flex-align-center"
         target="_blank"
+        href="https://soundcloud.com/krambzh"
+      >
+        <i class="fa fa-soundcloud" aria-hidden="true"></i>
+      </a>
+      <a
+        class="flex flex-center flex-align-center"
+        target="_blank"
         href="mailto:contact@kram-agency.com"
         ><i class="fa fa-envelope" aria-hidden="true"></i
       ></a>
@@ -211,6 +204,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
   }
 
   z-index: 100;
+  max-width: 100%;
   width: 25rem;
   left: 50%;
   top: 65%;
