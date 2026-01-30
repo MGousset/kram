@@ -12,12 +12,6 @@ const antmoDesc = [
   'Son objectif est clair : maintenir la tension et vous faire bouger du début à la fin.',
 ]
 
-const blancSoleilDesc = [
-  'Blanc Soleil est une voix nouvelle de la scène électronique française.',
-  'Il mêle rythmes percussifs, breaks inspirés de la scène Britannique et textures atmosphériques, construisant un son qui oscille entre énergie brute et émotion profonde.',
-  'Nourris par ses voyages, ses souvenirs et la culture club, ses sets et ses productions sont riches, immersifs et taillés pour le dancefloor.',
-]
-
 const miraDesc = [
   'Acid, envoûtant et percussif 👾',
   "Co-fondateur du projet Kram à Brest, Mira existe pour faire les corps et les âmes. Partageant des moments d'euphorie et de lâcher prise unique avec le public.",
@@ -48,27 +42,6 @@ export const artistes: artistesProps[] = [
     imageCenter: 70,
   },
   {
-    name: 'Blanc Soleil',
-    description: blancSoleilDesc,
-    imgUrl: blancSoleilUrl,
-    styles: ['Break/Techno', 'UKG', 'Dance'],
-    network: {
-      insta: 'https://www.instagram.com/blancsoleil_/',
-      soundCloud: 'https://soundcloud.com/blancsoleil',
-    },
-    trackIds: ['253A2221519568'],
-    prodIds: [
-      '253A2180696507',
-      '253A2180684051',
-      '253A2180681691',
-      '253A2180682495',
-      '253A2180686759',
-      '253A2180683219',
-      '253A2180688351',
-    ],
-    imageCenter: 20,
-  },
-  {
     name: 'MIRA',
     description: miraDesc,
     imgUrl: miraUrl,
@@ -78,11 +51,11 @@ export const artistes: artistesProps[] = [
       soundCloud: 'https://soundcloud.com/mira303',
     },
     trackIds: [
+      '253A2221518107',
       '253A2206343819',
       '253A2193743643',
       '253A2187448993',
       '253A2134135164',
-      '253A2047582812',
     ],
     prodIds: [],
     cutPercent: '29',
@@ -110,13 +83,6 @@ export const colorByImageUrl: Map<string, { color1: THREE.Color; color2: THREE.C
     {
       color1: new THREE.Color(156 + 50, 221 + 50, 214 + 50),
       color2: new THREE.Color(0 + 50, 142 + 50, 145 + 50),
-    },
-  ],
-  [
-    blancSoleilUrl,
-    {
-      color1: new THREE.Color(255, 251, 241),
-      color2: new THREE.Color(145, 93, 69),
     },
   ],
   [
