@@ -2,7 +2,6 @@ import type { artistesProps } from './components/artistItem.vue'
 import * as THREE from 'three'
 
 import antmoUrl from '@/assets/img/antmo.jpg'
-import blancSoleilUrl from '@/assets/img/blancSoleil.png'
 import miraUrl from '@/assets/img/mira.jpeg'
 import ronnieUrl from '@/assets/img/ronnie.jpg'
 
