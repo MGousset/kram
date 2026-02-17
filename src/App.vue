@@ -25,6 +25,8 @@ async function afterAnimation(): Promise<void> {
 
 onMounted(() => {
   innerScrollTo(0)
+  afterAnimation()
+
   window.addEventListener('resize', () => {
     innerScrollTo(0)
     centerArtistItems()
@@ -40,7 +42,7 @@ function innerScrollTo(position: number): void {
 async function centerArtistItems(): Promise<void> {
   const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
   if (!artistsMosaiqContainer) {
-    await new Promise((f) => setTimeout(f, 100))
+    await new Promise((f) => setTimeout(f, 10))
     return centerArtistItems()
   }
 
@@ -48,7 +50,7 @@ async function centerArtistItems(): Promise<void> {
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
-    await new Promise((f) => setTimeout(f, 100))
+    await new Promise((f) => setTimeout(f, 10))
     return centerArtistItems()
   }
 
@@ -126,9 +128,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
           :fontSize="9"
           containerClasses="titleContent"
           textClasses="title"
-          :onMontedAnimation="ANIMATION.randomstep"
           :onHoverLetterAnimation="ANIMATION.grow"
-          @finished="() => afterAnimation()"
         ></AnimatedText>
       </div>
     </div>
@@ -151,7 +151,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
                 :key="artiste.name"
                 :name="artiste.name"
                 :description="artiste.description"
-                :imgUrl="artiste.imgUrl"
+                :imgUrls="artiste.imgUrls"
                 :styles="artiste.styles"
                 :network="artiste.network"
                 :trackIds="artiste.trackIds"

@@ -79,7 +79,7 @@
 body {
   overflow-y: hidden;
   min-height: 100vh;
-  background-color: white;
+  background-color: black;
   transition:
     color 0.5s,
     background-color 0.5s;

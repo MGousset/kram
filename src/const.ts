@@ -1,7 +1,7 @@
 import type { artistesProps } from './components/artistItem.vue'
 import * as THREE from 'three'
 
-import antmoUrl from '@/assets/img/antmo.jpg'
+import antmoUrl from '@/assets/img/antmo2.jpg'
 import miraUrl from '@/assets/img/mira.jpeg'
 import ronnieUrl from '@/assets/img/ronnie.jpg'
 
@@ -13,7 +13,7 @@ const antmoDesc = [
 
 const miraDesc = [
   'Acid, envoûtant et percussif 👾',
-  "Co-fondateur du projet Kram à Brest, Mira existe pour faire les corps et les âmes. Partageant des moments d'euphorie et de lâcher prise unique avec le public.",
+  "Co-fondateur du projet Kram à Brest, Mira existe pour faire bouger les vibrer et les âmes. Partageant des moments d'euphorie et de lâcher prise unique avec le public.",
   'Armé de ses dernières découvertes musicales, Mira vous emmène avec lui pour un voyage immersif entre rythmiques saccadées et ligne de basse entraînante.',
   "Montez à bord, n'attachez pas vos ceintures et laissez-vous transporter par son énergie débordante.",
 ]
@@ -29,21 +29,21 @@ export const artistes: artistesProps[] = [
   {
     name: 'Antmo',
     description: antmoDesc,
-    imgUrl: antmoUrl,
-    cutPercent: '78',
+    imgUrls: [antmoUrl],
+    cutPercent: '29',
     styles: ['Hardgroove', 'Techno'],
     network: {
       insta: 'https://www.instagram.com/antmo_dule_/',
       soundCloud: 'https://soundcloud.com/krambzh/sets/antmo',
     },
-    trackIds: ['253A2190957747', '253A2190957507', '253A2056585340'],
-    prodIds: [],
-    imageCenter: 70,
+    trackIds: ['253A2225162126', '253A2190957747', '253A2190957507', '253A2056585340'],
+    prodIds: ['253A2122589400'],
+    imageCenter: 50,
   },
   {
     name: 'MIRA',
     description: miraDesc,
-    imgUrl: miraUrl,
+    imgUrls: [miraUrl],
     styles: ['Breakbeat', 'Bass', 'Techno'],
     network: {
       insta: 'https://www.instagram.com/mira3o3/',
@@ -63,13 +63,19 @@ export const artistes: artistesProps[] = [
   {
     name: 'Ronnie',
     description: ronnieDesc,
-    imgUrl: ronnieUrl,
+    imgUrls: [ronnieUrl],
     styles: ['House', 'Hard House', 'Trance'],
     network: {
       insta: 'https://www.instagram.com/ronni_lusion/',
       soundCloud: 'https://soundcloud.com/raoul-rivier',
     },
-    trackIds: ['253A2197414259', '253A2197390623', '253A2177484102', '253A2191290279'],
+    trackIds: [
+      '253A2259576593',
+      '253A2197414259',
+      '253A2197390623',
+      '253A2177484102',
+      '253A2191290279',
+    ],
     prodIds: [],
     cutPercent: '32',
     imageCenter: 30,

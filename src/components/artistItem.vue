@@ -15,7 +15,7 @@ const SoundCloudSong = defineAsyncComponent(() =>
 export type artistesProps = {
   name: string
   description: string[]
-  imgUrl: string
+  imgUrls: string[]
   cutPercent?: string
   styles: string[]
   trackIds: string[]
@@ -35,10 +35,11 @@ const emits = defineEmits({
   },
 })
 
-const isTrackLoaded = ref(false)
-const isProdLoaded = ref(false)
+const isTrackLoaded = ref(!props.trackIds.length)
+const isProdLoaded = ref(!props.prodIds.length)
 
-const backgroundImage = `url(${props.imgUrl})`
+const backgroundImages = props.imgUrls.map((img) => `url(${img})`)
+const backgroundImage = backgroundImages[0]
 const modalId = `ArtisteItem/${props.name}`
 let dialog: HTMLDialogElement
 
@@ -96,7 +97,7 @@ async function setTracksListener(): Promise<void> {
   for (const trackId of props.trackIds) {
     const track = document.getElementById(trackId)
 
-    if (!track) {
+    if (track == null) {
       await new Promise((f) => setTimeout(f, 100))
       setTracksListener()
     }
@@ -111,7 +112,7 @@ async function setProdsListener(): Promise<void> {
   for (const prodId of props.prodIds) {
     const prod = document.getElementById(prodId)
 
-    if (!prod) {
+    if (prod == null) {
       await new Promise((f) => setTimeout(f, 100))
       setProdsListener()
     }
@@ -140,7 +141,7 @@ const backgroundPosition = `50% ${props.imageCenter}%`
   <div
     id="artistContainer"
     :class="classes"
-    @mouseenter="$emit('focusImage', { id: imgUrl, isClicked: dialog.open })"
+    @mouseenter="$emit('focusImage', { id: imgUrls[0], isClicked: dialog.open })"
     @mouseleave="$emit('focusImage', { isClicked: dialog.open })"
     @click.stop.prevent="focus"
     class="color"
@@ -160,7 +161,7 @@ const backgroundPosition = `50% ${props.imageCenter}%`
     class="dialogContainer"
     @close="$emit('focusImage', { isClicked: false })"
   >
-    <div id="dialogContent" class="h-100 w-100 flex flex-column">
+    <div id="dialogContent" class="w-100 flex flex-column">
       <div id="infosContainer" class="color">
         <div id="infosContent" class="h-100 w-100 flex flex-column flex-between">
           <div class="w-100 flex flex-column">
@@ -207,18 +208,26 @@ const backgroundPosition = `50% ${props.imageCenter}%`
           </div>
         </div>
       </div>
+
+      <div id="photosContainer" class="w-100 flex flex-row flex-start">
+        <div
+          v-for="backgroundImage in backgroundImages"
+          :key="backgroundImage"
+          class="photoContainer h-100 w-100"
+          :style="{ backgroundImage: `${backgroundImage}` }"
+        ></div>
+      </div>
+
       <div id="detailsContainer" class="w-100 detailsContainer">
-        <div id="artistImageBackground" class="h-100 w-100"></div>
-        <div id="detailsContent" class="w-100 flex flex-column">
-          <div id="descriptionContainer" class="w-100">
-            <h3>Bio</h3>
-            <div id="descriptionContent" class="flex flex-column flex-center">
-              <p v-for="line in props.description" :key="line">{{ line }}</p>
-            </div>
-          </div>
-          <div v-if="props.trackIds.length" id="trackContainer" class="w-100">
+        <div id="detailsContent" class="w-100 flex flex-row flex-wrap flex-center">
+          <div
+            v-if="props.trackIds.length"
+            v-show="isTrackLoaded"
+            id="trackContainer"
+            class="h-100"
+          >
             <h3>Sets</h3>
-            <div v-show="isTrackLoaded" id="trackContent" class="w-100 flex flex-column">
+            <div id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
                 v-for="id in props.trackIds"
                 :key="id"
@@ -226,15 +235,11 @@ const backgroundPosition = `50% ${props.imageCenter}%`
                 classes="trackItem"
               ></SoundCloudSong>
             </div>
-            <div
-              id="loading"
-              class="w-100 flex flex-center flex-align-center"
-              v-show="!isTrackLoaded"
-            ></div>
           </div>
-          <div v-if="props.prodIds.length" id="trackContainer" class="w-100">
+
+          <div v-if="props.prodIds.length" v-show="isProdLoaded" id="trackContainer" class="h-100">
             <h3>Productions</h3>
-            <div v-show="isProdLoaded" id="trackContent" class="w-100 flex flex-column">
+            <div id="trackContent" class="w-100 flex flex-column">
               <SoundCloudSong
                 v-for="id in props.prodIds"
                 :key="id"
@@ -242,11 +247,13 @@ const backgroundPosition = `50% ${props.imageCenter}%`
                 classes="trackItem"
               ></SoundCloudSong>
             </div>
-            <div
-              id="loading"
-              class="w-100 flex flex-center flex-align-center"
-              v-show="!isProdLoaded"
-            ></div>
+          </div>
+
+          <div id="descriptionContainer" class="h-100">
+            <h3>Bio</h3>
+            <div id="descriptionContent" class="flex flex-column flex-center">
+              <p v-for="line in props.description" :key="line">{{ line }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -342,34 +349,33 @@ const backgroundPosition = `50% ${props.imageCenter}%`
 }
 
 .dialogContainer {
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 0.25rem; /* width of the entire scrollbar */
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #181818; /* color of the tracking area */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: white; /* color of the scroll thumb */
+    border-radius: 0px 5px 5px 0px; /* roundness of the scroll thumb */
+    border: transparent; /* creates padding around scroll thumb */
+  }
+
   #dialogContent {
     background-color: #181818;
     justify-items: center;
-    position: relative;
     padding: 0rem;
-
-    &::-webkit-scrollbar {
-      width: 0.5rem; /* width of the entire scrollbar */
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent; /* color of the tracking area */
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: white; /* color of the scroll thumb */
-      border-radius: 5px; /* roundness of the scroll thumb */
-      border: transparent; /* creates padding around scroll thumb */
-    }
 
     #infosContainer {
       padding: 0rem;
-      z-index: 1;
-      height: 17rem;
+      height: 14rem;
       border-bottom: 0.125rem $color solid;
 
       #infosContent {
-        padding: 2rem;
+        padding: 1rem;
 
         h2 {
           margin: 0px;
@@ -431,9 +437,18 @@ const backgroundPosition = `50% ${props.imageCenter}%`
       }
     }
 
+    #photosContainer {
+      height: 14rem;
+
+      .photoContainer {
+        background-size: 100%;
+        background-repeat: no-repeat;
+        background-position: v-bind(backgroundPosition);
+      }
+    }
+
     #detailsContainer {
-      height: calc(100% - 17rem);
-      position: relative;
+      border-top: 0.125rem $color solid;
 
       h3,
       p,
@@ -441,56 +456,25 @@ const backgroundPosition = `50% ${props.imageCenter}%`
         color: $color;
       }
 
-      #artistImageBackground {
-        position: absolute;
-        background-image: v-bind(backgroundImage);
-        background-size: 120%;
-        background-position: v-bind(backgroundPosition);
-        background-repeat: no-repeat;
-      }
-
       #detailsContent {
+        min-height: 300px;
         background-color: rgba(0, 0, 0, 0.4);
-        position: relative;
-        z-index: 1;
-        height: 100%;
-        overflow-y: auto;
-
-        &::-webkit-scrollbar {
-          width: 0.5rem; /* width of the entire scrollbar */
-        }
-
-        &::-webkit-scrollbar-track {
-          background: transparent; /* color of the tracking area */
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background-color: white; /* color of the scroll thumb */
-          border-radius: 5px; /* roundness of the scroll thumb */
-          border: transparent; /* creates padding around scroll thumb */
-        }
+        padding: 0.5rem;
 
         #trackContainer,
         #descriptionContainer {
-          padding: 0.5rem 2rem;
-        }
-        #trackContainer {
-          #trackContent {
-            .trackItem {
-              margin-bottom: 0.5rem;
-              margin-top: 0.5rem;
-            }
-          }
+          padding: 0.5rem;
+          flex-grow: 1;
+          min-width: 300px;
         }
 
-        #loading {
-          background-image: url('@/assets/img/loading.gif');
-          background-repeat: no-repeat;
-          background-position: center;
-          background-size: 15%;
-          height: 9rem;
-          max-height: 9rem;
-          aspect-ratio: 1;
+        .trackItem {
+          margin-bottom: 0.5rem;
+          margin-top: 0.5rem;
+        }
+
+        #descriptionContent {
+          max-width: 400px;
         }
       }
     }
