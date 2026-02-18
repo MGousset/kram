@@ -42,7 +42,9 @@ onMounted(() => {
   window.addEventListener('resize', onResize)
   onResize()
 
-  animate({ animation: ANIMATION.randomstep, duration: 2000, stepDuration: 15 })
+  if (props.onMontedAnimation) {
+    animate({ animation: ANIMATION.randomstep, duration: 2000, stepDuration: 15 })
+  }
 })
 
 function onResize(): void {

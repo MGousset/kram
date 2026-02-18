@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import { onMounted, ref } from 'vue'
-import { ANIMATION } from '@/tools/tools'
+import { ANIMATION, copy } from '@/tools/tools'
 import { artistes, colorByImageUrl } from './const'
 
 import AnimatedText from './components/animatedText.vue'
@@ -25,6 +25,8 @@ async function afterAnimation(): Promise<void> {
 
 onMounted(() => {
   innerScrollTo(0)
+  afterAnimation()
+
   window.addEventListener('resize', () => {
     innerScrollTo(0)
     centerArtistItems()
@@ -40,7 +42,7 @@ function innerScrollTo(position: number): void {
 async function centerArtistItems(): Promise<void> {
   const artistsMosaiqContainer = document.getElementById('artistsMosaiqContainer')
   if (!artistsMosaiqContainer) {
-    await new Promise((f) => setTimeout(f, 100))
+    await new Promise((f) => setTimeout(f, 10))
     return centerArtistItems()
   }
 
@@ -48,7 +50,7 @@ async function centerArtistItems(): Promise<void> {
     'artistItem',
   ) as HTMLCollectionOf<HTMLDivElement>
   if (!artistItems.length) {
-    await new Promise((f) => setTimeout(f, 100))
+    await new Promise((f) => setTimeout(f, 10))
     return centerArtistItems()
   }
 
@@ -126,9 +128,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
           :fontSize="9"
           containerClasses="titleContent"
           textClasses="title"
-          :onMontedAnimation="ANIMATION.randomstep"
           :onHoverLetterAnimation="ANIMATION.grow"
-          @finished="() => afterAnimation()"
         ></AnimatedText>
       </div>
     </div>
@@ -151,7 +151,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
                 :key="artiste.name"
                 :name="artiste.name"
                 :description="artiste.description"
-                :imgUrl="artiste.imgUrl"
+                :imgUrls="artiste.imgUrls"
                 :styles="artiste.styles"
                 :network="artiste.network"
                 :trackIds="artiste.trackIds"
@@ -183,10 +183,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
       >
         <i class="fa fa-soundcloud" aria-hidden="true"></i>
       </a>
-      <a
-        class="flex flex-center flex-align-center"
-        target="_blank"
-        href="mailto:contact@kram-agency.com"
+      <a class="flex flex-center flex-align-center" @click="() => copy(`booking@kram-agency.com`)"
         ><i class="fa fa-envelope" aria-hidden="true"></i
       ></a>
     </div>

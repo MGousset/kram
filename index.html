@@ -12,6 +12,20 @@
   </head>
   <body>
     <div id="app"></div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 100000">
+      <div
+        id="liveToast"
+        class="toast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        style="z-index: 100000"
+      >
+        <div id="liveToastBody" class="toast-body"></div>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

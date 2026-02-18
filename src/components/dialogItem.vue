@@ -57,6 +57,9 @@ dialog {
   border-radius: 5px;
 
   #closeButton {
+    border: none;
+    outline: none !important;
+    box-shadow: none;
     z-index: 102;
     position: absolute;
     top: 0px;

@@ -1,3 +1,4 @@
+import { Toast } from 'bootstrap'
 import * as THREE from 'three'
 
 export const enum ANIMATION {
@@ -73,4 +74,19 @@ export function detectMobile(): boolean {
     }) ||
     (screen.height <= 800 && screen.width <= 600)
   )
+}
+
+export function copy(copiedText: string): void {
+  // Copy the text inside the text field
+  navigator.clipboard.writeText(copiedText)
+
+  const toast = document.getElementById('liveToast')
+  const toastBody = document.getElementById('liveToastBody')
+  if (!toast || !toastBody) {
+    return
+  }
+
+  toastBody.innerText = 'Text copied : booking@kram-agency.com'
+  const toastInstance = Toast.getOrCreateInstance(toast)
+  toastInstance.show()
 }
