@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import DialogItem from './dialogItem.vue'
-import { useWindowSize } from '@vueuse/core'
-import { detectMobile } from '@/tools/tools'
+import { copy, detectMobile } from '@/tools/tools'
 
 const SoundCloudSong = defineAsyncComponent(() =>
   import('./soundCloudSong.vue').then((comp) => {
@@ -198,12 +197,10 @@ const backgroundPosition = `50% ${props.imageCenter}%`
             <a
               id="bookButton"
               class="inverse-color flex flex-around flex-align-center"
-              target="_blank"
-              href="mailto:booking@kram-agency.com"
-              @click="() => openPage(`mailto:booking@kram-agency.com`)"
+              @click="() => copy(`booking@kram-agency.com`)"
             >
               <i class="fa fa-envelope" aria-hidden="true"></i>
-              <h4>Book</h4>
+              <h4>Email</h4>
             </a>
           </div>
         </div>
