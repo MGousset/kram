@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import { onMounted, ref } from 'vue'
-import { ANIMATION } from '@/tools/tools'
+import { ANIMATION, copy } from '@/tools/tools'
 import { artistes, colorByImageUrl } from './const'
 
 import AnimatedText from './components/animatedText.vue'
@@ -183,10 +183,7 @@ function changeBgColors(p: { id?: string; isClicked: boolean }): void {
       >
         <i class="fa fa-soundcloud" aria-hidden="true"></i>
       </a>
-      <a
-        class="flex flex-center flex-align-center"
-        target="_blank"
-        href="mailto:contact@kram-agency.com"
+      <a class="flex flex-center flex-align-center" @click="() => copy(`booking@kram-agency.com`)"
         ><i class="fa fa-envelope" aria-hidden="true"></i
       ></a>
     </div>
